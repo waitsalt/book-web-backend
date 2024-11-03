@@ -1,0 +1,6 @@
+server:
+    port: 8000
+
+database:
+    type: sqlite
+    url: "sqlite::"
