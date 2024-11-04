@@ -6,3 +6,6 @@ database:
 
 logger:
     level: "debug"
+
+data:
+    path: "data"
