@@ -1,17 +1,18 @@
+use crate::util::config::CONFIG;
+use crate::util::error::AppError;
 use serde::Deserialize;
 use serde::Serialize;
 use tokio::io::AsyncWriteExt;
 
-use crate::util::error::AppError;
-
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Book {
-    id: String,
-    name: String,
-    author: String,
-    tag: String,
-    desc: String,
-    chapter: Vec<(String, String)>,
+    pub id: String,
+    pub name: String,
+    pub author: String,
+    pub status: String,
+    pub tag: String,
+    pub desc: String,
+    pub chapter: Vec<String>,
     // uploader: String,
     // checker: String,
     // upload_time: String,
@@ -31,7 +32,7 @@ pub struct UploadBook {
 impl UploadBook {
     pub async fn save_to_file(&self) -> Result<(), AppError> {
         let file_name = format!("[{}]{}", self.author, self.name);
-        let file_path = format!("{}.txt", file_name);
+        let file_path = format!("{}/book/{}.txt", CONFIG.data.path, file_name);
         let mut file = tokio::fs::File::create(&file_path)
             .await
             .map_err(|_| AppError::Other)?;

@@ -20,10 +20,16 @@ pub struct Logger {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct Data {
+    pub path: String,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct Config {
     pub server: Server,
     pub database: Database,
     pub logger: Logger,
+    pub data: Data,
 }
 
 impl Config {
