@@ -2,5 +2,7 @@ server:
     port: 8000
 
 database:
-    type: sqlite
-    url: "sqlite::"
+    url: "postgresql://postgres:123456@localhost:5432/novel-web"
+
+logger:
+    level: "debug"
