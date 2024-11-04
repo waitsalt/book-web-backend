@@ -4,9 +4,8 @@ use crate::{
 };
 use axum::{
     extract::{Multipart, Path},
-    response::Html,
     routing::{get, post},
-    Json, Router,
+    Router,
 };
 
 pub async fn init() -> Router {
