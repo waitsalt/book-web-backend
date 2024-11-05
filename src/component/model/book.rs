@@ -1,3 +1,4 @@
+use crate::component::database::book::update_book_info_db;
 use crate::util::config::CONFIG;
 use crate::util::error::AppError;
 use serde::Deserialize;
@@ -12,11 +13,11 @@ pub struct Book {
     pub status: String,
     pub tag: String,
     pub desc: String,
-    pub chapter: Vec<String>,
-    // uploader: String,
-    // checker: String,
-    // upload_time: String,
-    // edit_time: String,
+    pub chapter: Vec<String>, // 存章节名
+                              // uploader: String,
+                              // checker: String,
+                              // upload_time: String,
+                              // edit_time: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -26,30 +27,49 @@ pub struct UploadBook {
     pub status: String,
     pub tag: String,
     pub desc: String,
-    pub chapter: Vec<(String, String)>,
+    pub chapter: Vec<(String, String)>, // 章节名 章节内容
 }
 
-impl UploadBook {
-    pub async fn save_to_file(&self) -> Result<(), AppError> {
-        let file_name = format!("[{}]{}", self.author, self.name);
-        let file_path = format!("{}/book/{}.txt", CONFIG.data.path, file_name);
-        let mut file = tokio::fs::File::create(&file_path)
-            .await
-            .map_err(|_| AppError::Other)?;
+#[derive(Debug, Deserialize, Serialize, sqlx::FromRow)]
+pub struct DescBook {
+    pub id: String,
+    pub name: String,
+    pub author: String,
+    pub status: String,
+    pub tag: String,
+    pub desc: String,
+    // uploader: String,
+    // checker: String,
+    // upload_time: String,
+    // edit_time: String,
+}
 
-        let book_info = format!(
-            "书名: {}\n作者: {}\n状态: {}\n标签: {}\n简介: \n{}",
-            self.name, self.author, self.status, self.tag, self.desc
-        );
-        file.write_all(book_info.as_bytes())
-            .await
-            .map_err(|_| AppError::Other)?;
-        for (chapter_name, chapter_content) in &self.chapter {
-            let chapter = format!("\n\n{}\n{}", chapter_name, chapter_content);
-            file.write_all(chapter.as_bytes())
-                .await
-                .map_err(|_| AppError::Other)?;
+#[derive(Debug, Deserialize, Serialize)]
+pub struct SearchBook {
+    pub name: String,
+    pub author: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Chapter {
+    pub name: String,
+    pub content: String,
+}
+
+impl Book {
+    pub async fn from_uplaod_book(upload_book: &UploadBook, book_id: &String) -> Self {
+        let mut chapter: Vec<String> = Vec::new();
+        for (name, content) in upload_book.chapter.clone() {
+            chapter.push(name);
         }
-        Ok(())
+        Self {
+            id: book_id.clone(),
+            name: upload_book.name.clone(),
+            author: upload_book.author.clone(),
+            status: upload_book.status.clone(),
+            tag: upload_book.tag.clone(),
+            desc: upload_book.desc.clone(),
+            chapter: chapter,
+        }
     }
 }

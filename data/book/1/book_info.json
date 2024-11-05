@@ -1,1 +1,12 @@
-{"id":"1","name":"book_1","author":"author_1","status":"完结","tag":"#tag_1","desc":"desc_1","chapter":["chapter_1","chapter_2"]}
+{
+    "id": "1",
+    "name": "book_1",
+    "author": "author_1",
+    "status": "完结",
+    "tag": "#tag_1",
+    "desc": "desc_1",
+    "chapter": [
+        "chapter_1",
+        "chapter_2"
+    ]
+}

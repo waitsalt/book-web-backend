@@ -1,6 +1,5 @@
 use axum::{
     http::{StatusCode, Uri},
-    routing::get,
     Router,
 };
 use tower_http::trace;
