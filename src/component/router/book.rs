@@ -4,7 +4,7 @@ use crate::component::database::book::{
 use crate::component::model::book::{Book, Chapter, DescBook, SearchBook};
 use crate::util::config::CONFIG;
 use crate::{
-    component::model::book::UploadBook,
+    component::model::book::InfoBook,
     util::error::{AppError, BookError},
 };
 use axum::http::header;
@@ -43,7 +43,7 @@ pub async fn book() -> &'static str {
 async fn upload_book(mut multipart: Multipart) -> Result<&'static str, AppError> {
     while let Some(field) = multipart.next_field().await.unwrap() {
         let data = field.bytes().await.unwrap();
-        let upload_book: UploadBook = serde_json::from_slice(&data)
+        let upload_book: InfoBook = serde_json::from_slice(&data)
             .map_err(|_| AppError::BookError(BookError::UploadFileFormatError))?;
 
         // 检查上传文件的唯一性
@@ -53,7 +53,7 @@ async fn upload_book(mut multipart: Multipart) -> Result<&'static str, AppError>
 
         // 将 json 文件按照规定的格式转为 txt，并保存
         let file_name = format!("[{}]{}", upload_book.author, upload_book.name);
-        let book_id = nanoid::nanoid!();
+        let book_id = nanoid::nanoid!(10);
         let file_dir_path = format!("{}/book/{}", CONFIG.data.path, book_id);
         let file_path = format!("{}/book/{}/{}.txt", CONFIG.data.path, book_id, file_name);
         tokio::fs::create_dir(&file_dir_path).await.unwrap();
@@ -66,13 +66,15 @@ async fn upload_book(mut multipart: Multipart) -> Result<&'static str, AppError>
             upload_book.tag,
             upload_book.desc
         );
+        let mut chapters: Vec<(String, String)> = Vec::new();
         file.write_all(book_info.as_bytes()).await.unwrap();
         for (chapter_name, chapter_content) in &upload_book.chapter {
             let chapter = format!("\n\n{}\n{}", chapter_name, chapter_content);
             file.write_all(chapter.as_bytes()).await.unwrap();
 
-            let chapter_path =
-                format!("{}/book/{}/{}.txt", CONFIG.data.path, book_id, chapter_name);
+            let chapter_id = nanoid::nanoid!(5);
+            chapters.push((chapter_id.clone(), chapter_name.clone()));
+            let chapter_path = format!("{}/book/{}/{}.txt", CONFIG.data.path, book_id, chapter_id);
             let _ = tokio::fs::File::create(&chapter_path).await.unwrap();
             tokio::fs::write(&chapter_path, chapter_content.as_bytes())
                 .await
@@ -81,8 +83,9 @@ async fn upload_book(mut multipart: Multipart) -> Result<&'static str, AppError>
 
         // 生成 book_info.json 文件
         // 并保存
-        let book_info_json = Book::from_uplaod_book(&upload_book, &book_id).await;
-        let book_info_string = serde_json::to_string(&book_info_json).unwrap();
+        let mut book_info = upload_book.clone();
+        book_info.chapter = chapters;
+        let book_info_string = serde_json::to_string(&book_info).unwrap();
         let book_info_file_path = format!("{}/book/{}/book_info.json", CONFIG.data.path, book_id);
         let _ = tokio::fs::File::create(&book_info_file_path).await.unwrap();
         tokio::fs::write(&book_info_file_path, book_info_string.as_bytes())
@@ -90,16 +93,17 @@ async fn upload_book(mut multipart: Multipart) -> Result<&'static str, AppError>
             .unwrap();
 
         // 将 book_info 中的数据上传到数据库中
-        update_book_info_db(&book_info_json).await?;
+        let book_info = Book::from_info_book(&book_info, &book_id).await;
+        update_book_info_db(&book_info).await?;
         return Ok("success");
     }
     Err(AppError::BookError(BookError::NoUploadFile))
 }
 
-async fn read_book(Path(book_id): Path<String>) -> Result<Json<Book>, AppError> {
+async fn read_book(Path(book_id): Path<String>) -> Result<Json<InfoBook>, AppError> {
     let book_info_path = format!("{}/book/{}/book_info.json", CONFIG.data.path, book_id);
     let book_info_string = tokio::fs::read_to_string(&book_info_path).await.unwrap();
-    let book_info: Book = serde_json::from_str(&book_info_string).unwrap();
+    let book_info: InfoBook = serde_json::from_str(&book_info_string).unwrap();
     Ok(Json(book_info))
 }
 

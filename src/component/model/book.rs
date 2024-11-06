@@ -13,15 +13,15 @@ pub struct Book {
     pub status: String,
     pub tag: String,
     pub desc: String,
-    pub chapter: Vec<String>, // 存章节名
+    pub chapter: Vec<String>, // 存章节 id
                               // uploader: String,
                               // checker: String,
                               // upload_time: String,
                               // edit_time: String,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-pub struct UploadBook {
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct InfoBook {
     pub name: String,
     pub author: String,
     pub status: String,
@@ -57,18 +57,18 @@ pub struct Chapter {
 }
 
 impl Book {
-    pub async fn from_uplaod_book(upload_book: &UploadBook, book_id: &String) -> Self {
+    pub async fn from_info_book(info_book: &InfoBook, book_id: &String) -> Self {
         let mut chapter: Vec<String> = Vec::new();
-        for (name, content) in upload_book.chapter.clone() {
-            chapter.push(name);
+        for (id, name) in info_book.chapter.clone() {
+            chapter.push(id);
         }
         Self {
             id: book_id.clone(),
-            name: upload_book.name.clone(),
-            author: upload_book.author.clone(),
-            status: upload_book.status.clone(),
-            tag: upload_book.tag.clone(),
-            desc: upload_book.desc.clone(),
+            name: info_book.name.clone(),
+            author: info_book.author.clone(),
+            status: info_book.status.clone(),
+            tag: info_book.tag.clone(),
+            desc: info_book.desc.clone(),
             chapter: chapter,
         }
     }
