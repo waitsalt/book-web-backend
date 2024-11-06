@@ -2,12 +2,15 @@ use axum::Json;
 
 use crate::{
     component::model::book::{Book, DescBook},
-    util::{database::POOL, error::AppError},
+    util::{
+        database::POOL,
+        error::{AppError, BookError, DatabaseError},
+    },
 };
 
 pub async fn update_book_info_db(book_info: &Book) -> Result<(), AppError> {
     let pool = POOL.get().expect("pool get error").clone();
-    let res = sqlx::query(
+    let _ = sqlx::query(
         "insert into public.book(id,name,author,status,tag,\"desc\",chapter) values ($1,$2,$3,$4,$5,$6,$7);",
     )
     .bind(&book_info.id)
@@ -19,7 +22,7 @@ pub async fn update_book_info_db(book_info: &Book) -> Result<(), AppError> {
     .bind(&book_info.chapter)
     .fetch_optional(&pool)
     .await
-    .unwrap();
+    .map_err(|_| AppError::BookError(BookError::NotUploadSql))?;
     Ok(())
 }
 
@@ -40,7 +43,7 @@ pub async fn fuzzy_search_book_by_name_and_author(
     .bind(&author)
     .fetch_all(&pool)
     .await
-    .unwrap();
+    .map_err(|_| AppError::DatabaseError(DatabaseError::SqlRunError))?;
     Ok(Json(books))
 }
 
@@ -51,7 +54,7 @@ pub async fn check_book_unique(name: &String, author: &String) -> Result<bool, A
         .bind(&author)
         .fetch_optional(&pool)
         .await
-        .unwrap();
+        .map_err(|_| AppError::DatabaseError(DatabaseError::SqlRunError))?;
     match res {
         Some(_) => Ok(true),
         None => Ok(false),

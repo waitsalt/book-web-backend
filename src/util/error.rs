@@ -14,7 +14,7 @@ pub enum BookError {
 #[derive(Debug, Error)]
 #[error("...")]
 pub enum DatabaseError {
-    PoolGetError,
+    // PoolGetError,
     SqlRunError,
 }
 
@@ -44,9 +44,9 @@ impl IntoResponse for AppError {
             }
 
             // database
-            AppError::DatabaseError(DatabaseError::PoolGetError) => {
-                (StatusCode::BAD_REQUEST, 1000, "connect sql pool failure")
-            }
+            // AppError::DatabaseError(DatabaseError::PoolGetError) => {
+            //     (StatusCode::BAD_REQUEST, 1000, "connect sql pool failure")
+            // }
             AppError::DatabaseError(DatabaseError::SqlRunError) => {
                 (StatusCode::BAD_REQUEST, 1001, "sql run error")
             }

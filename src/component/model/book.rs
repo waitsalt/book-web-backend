@@ -1,9 +1,5 @@
-use crate::component::database::book::update_book_info_db;
-use crate::util::config::CONFIG;
-use crate::util::error::AppError;
 use serde::Deserialize;
 use serde::Serialize;
-use tokio::io::AsyncWriteExt;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Book {
@@ -59,7 +55,7 @@ pub struct Chapter {
 impl Book {
     pub async fn from_info_book(info_book: &InfoBook, book_id: &String) -> Self {
         let mut chapter: Vec<String> = Vec::new();
-        for (id, name) in info_book.chapter.clone() {
+        for (id, _) in info_book.chapter.clone() {
             chapter.push(id);
         }
         Self {
