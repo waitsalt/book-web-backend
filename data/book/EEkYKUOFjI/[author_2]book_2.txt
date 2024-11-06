@@ -1,0 +1,12 @@
+书名: book_2
+作者: author_2
+状态: 连载
+标签: #tag_2
+简介: 
+desc_2
+
+chapter_1
+chapter_content_1
+
+chapter_2
+chapter_content_2

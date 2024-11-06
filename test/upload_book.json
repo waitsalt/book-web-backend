@@ -1,9 +1,9 @@
 {
-    "name": "book_1",
-    "author": "author_1",
-    "status": "完结",
-    "tag": "#tag_1",
-    "desc": "desc_1",
+    "name": "book_2",
+    "author": "author_2",
+    "status": "连载",
+    "tag": "#tag_2",
+    "desc": "desc_2",
     "chapter": [
         [
             "chapter_1",

@@ -76,9 +76,12 @@ async fn upload_book(mut multipart: Multipart) -> Result<&'static str, AppError>
             chapters.push((chapter_id.clone(), chapter_name.clone()));
             let chapter_path = format!("{}/book/{}/{}.txt", CONFIG.data.path, book_id, chapter_id);
             let _ = tokio::fs::File::create(&chapter_path).await.unwrap();
-            tokio::fs::write(&chapter_path, chapter_content.as_bytes())
-                .await
-                .unwrap();
+            tokio::fs::write(
+                &chapter_path,
+                format!("{}\n{}", chapter_name, chapter_content).as_bytes(),
+            )
+            .await
+            .unwrap();
         }
 
         // 生成 book_info.json 文件
@@ -148,7 +151,7 @@ async fn edit_chapter(
 async fn download_book(Path(book_id): Path<String>) -> Result<impl IntoResponse, AppError> {
     let book_info_path = format!("{}/book/{}/book_info.json", CONFIG.data.path, book_id);
     let book_info_string = tokio::fs::read_to_string(&book_info_path).await.unwrap();
-    let book_info_json: Book = serde_json::from_str(&book_info_string).unwrap();
+    let book_info_json: InfoBook = serde_json::from_str(&book_info_string).unwrap();
     let book_file_name = format!("[{}]{}.txt", book_info_json.author, book_info_json.name);
     let book_file_path = format!("{}/book/{}/{}", CONFIG.data.path, book_id, book_file_name);
     let headers = [
