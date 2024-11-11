@@ -9,6 +9,7 @@ pub enum BookError {
     UploadFileFormatError,
     NotUploadSql,
     BookExist,
+    BookNotExist,
 }
 
 #[derive(Debug, Error)]
@@ -41,6 +42,9 @@ impl IntoResponse for AppError {
             }
             AppError::BookError(BookError::BookExist) => {
                 (StatusCode::BAD_REQUEST, 0003, "book is exit")
+            }
+            AppError::BookError(BookError::BookNotExist) => {
+                (StatusCode::BAD_REQUEST, 0004, "book is not exit")
             }
 
             // database

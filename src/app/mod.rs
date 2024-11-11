@@ -1,4 +1,4 @@
-use crate::component::router;
+use crate::router;
 use crate::util::{database, logger};
 use axum::Router;
 

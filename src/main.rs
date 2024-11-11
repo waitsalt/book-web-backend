@@ -1,5 +1,6 @@
 mod app;
-mod component;
+mod model;
+mod router;
 mod util;
 
 use util::config::CONFIG;
