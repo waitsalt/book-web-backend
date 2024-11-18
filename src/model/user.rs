@@ -1,13 +1,16 @@
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Serialize, Deserialize, sqlx::FromRow, Clone)]
 pub struct User {
-    pub user_id: i64,          // 用户ID
-    pub user_name: String,     // 用户名
-    pub user_password: String, // 密码
-    pub picture: String,       // 头像
-    pub email: String,         // 邮箱
-    pub is_admin: bool,        // 是否为管理员
-    pub is_delete: bool,       // 是否被删除
-    pub create_time: String,   // 创建时间
+    pub user_id: String,
+    pub user_name: String,
+    pub user_password: String,
+    pub user_email: String,
+    pub avatar_url: String, // 头像 url
+    pub level: i16,         // 0
+    pub status: i16,        // 0. 正常 1. 被封禁 2. 删除
+    pub identity: i16,      // 0. 普通 1. 管理员 2. 超级管理员
+    pub create_time: DateTime<Utc>,
+    pub update_time: DateTime<Utc>,
 }

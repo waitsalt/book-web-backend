@@ -4,8 +4,15 @@ server:
 database:
     url: "postgresql://postgres:123456@localhost:5432/novel-web"
 
+redis:
+    url: "redis://127.0.0.1/"
+
 logger:
     level: "debug"
 
 data:
     path: "data"
+
+auth:
+    secret: "123456"
+    duration: 3

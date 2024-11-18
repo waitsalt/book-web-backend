@@ -5,14 +5,17 @@ edition = "2021"
 
 [dependencies]
 axum = { version = "*", features = ["multipart"] }
-axum-extra = "0.9.4"
+axum-extra = { version = "0.9.4", features = ["typed-header"] }
+chrono = { version = "0.4.38", features = ["serde"] }
 config = "*"
+jsonwebtoken = "9.3.0"
 nanoid = "0.4.0"
 once_cell = "*"
+redis = "0.27.5"
 serde = "*"
 serde_json = "*"
-sqlx = { version = "*", features = ["runtime-tokio", "postgres"] }
-thiserror = "*"
+sqlx = { version = "*", features = ["runtime-tokio", "postgres", "chrono"] }
+thiserror = "2.0.3"
 tokio = { version = "*", features = ["full"] }
 tokio-util = { version = "0.7.12", features = ["io"] }
 tower-http = { version = "0.6.1", features = ["trace", "cors"] }

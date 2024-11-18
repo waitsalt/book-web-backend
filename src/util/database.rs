@@ -1,19 +1,22 @@
-use crate::util::config::CONFIG;
-use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
-use std::time::Duration;
-use tokio::sync::OnceCell;
+use once_cell::sync::OnceCell;
+use sqlx::{postgres::PgPoolOptions, PgPool, Pool, Postgres};
 
-pub static POOL: OnceCell<Pool<Postgres>> = OnceCell::const_new();
+use super::config::CONFIG;
+
+static POOL: OnceCell<PgPool> = OnceCell::new();
 
 pub async fn init() {
-    POOL.get_or_init(|| async {
-        let database_url = CONFIG.database.url.as_str();
-        PgPoolOptions::new()
-            .max_connections(6)
-            .acquire_timeout(Duration::from_secs(3))
-            .connect(&database_url)
-            .await
-            .expect("Failed to connect to the database")
-    })
-    .await;
+    let database_url = CONFIG.database.url.clone();
+
+    let pool = PgPoolOptions::new()
+        .max_connections(10)
+        .connect(&database_url)
+        .await
+        .expect("database init error");
+
+    assert!(POOL.set(pool).is_ok(), "database init false");
+}
+
+pub async fn get_pool() -> &'static Pool<Postgres> {
+    POOL.get().expect("datebase pool get error")
 }

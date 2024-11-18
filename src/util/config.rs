@@ -5,6 +5,12 @@ use std::env;
 pub static CONFIG: Lazy<Config> = Lazy::new(|| Config::init().expect("config init failure"));
 
 #[derive(Debug, Deserialize)]
+pub struct Auth {
+    pub secret: String,
+    pub duration: i64,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct Server {
     pub port: u16,
 }
@@ -15,21 +21,28 @@ pub struct Database {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct Redis {
+    pub url: String,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct Logger {
     pub level: String,
 }
 
-#[derive(Debug, Deserialize)]
-pub struct Data {
-    pub path: String,
-}
+// #[derive(Debug, Deserialize)]
+// pub struct Data {
+//     pub path: String,
+// }
 
 #[derive(Debug, Deserialize)]
 pub struct Config {
+    pub auth: Auth,
     pub server: Server,
     pub database: Database,
+    pub redis: Redis,
     pub logger: Logger,
-    pub data: Data,
+    // pub data: Data,
 }
 
 impl Config {
