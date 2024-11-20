@@ -1,9 +1,9 @@
 mod create_user;
 mod delete_user;
 mod get_all_user;
+mod get_user_info;
 mod logout;
 mod signin;
-mod user_info;
 
 use axum::{
     routing::{get, post},
@@ -18,7 +18,7 @@ pub async fn init() -> Router {
         )
         .route(
             "/:user_id",
-            get(user_info::user_info).delete(delete_user::delete_user),
+            get(get_user_info::query_user_info).delete(delete_user::delete_user),
         )
         .route("/signin", post(signin::signin))
         .route("/logout", get(logout::logout))

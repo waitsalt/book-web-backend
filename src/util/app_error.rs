@@ -11,6 +11,17 @@ pub enum AppError {
     UserBlocked,
     UserDeleted,
     UserMissPermission,
+    UserCreateFailure,
+    UserPasswordError,
+
+    // author
+    AuthorNotExist,
+
+    // book
+    BookNotExist,
+
+    // chapter
+    ChapterNotExist,
 
     // auth
     InvalidToken,
@@ -49,6 +60,17 @@ impl IntoResponse for AppError {
             AppError::UserBlocked => (bad_request, 1004, "用户被封禁"),
             AppError::UserDeleted => (bad_request, 1005, "用户已被删除"),
             AppError::UserMissPermission => (bad_request, 1006, "用户没有权限"),
+            AppError::UserCreateFailure => (bad_request, 1007, "用户创建失败"),
+            AppError::UserPasswordError => (bad_request, 1008, "用户密码错误"),
+
+            // author
+            AppError::AuthorNotExist => (bad_request, 1101, "作者不存在"),
+
+            // book
+            AppError::BookNotExist => (bad_request, 1201, "书籍不存在"),
+
+            // chapter
+            AppError::ChapterNotExist => (bad_request, 1301, "章节不存在"),
 
             // auth
             AppError::InvalidToken => (bad_request, 2001, "无效的 token"),

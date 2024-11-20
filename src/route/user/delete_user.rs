@@ -1,26 +1,19 @@
 use axum::extract::Path;
 
-use crate::util::{
-    app_error::AppError, app_response::AppResponse, auth::ClaimsUser, database::get_pool, AppResult,
-};
+use crate::model::user::ClaimsUser;
+use crate::sql;
+use crate::util::{app_error::AppError, app_response::AppResponse, database::get_pool, AppResult};
 
-pub async fn delete_user(user: ClaimsUser, Path(user_id): Path<String>) -> AppResult<u64> {
-    if user.identity < 2 {
+pub async fn delete_user(
+    claims_user: ClaimsUser,
+    Path(user_id): Path<i32>,
+) -> AppResult<Option<String>> {
+    if claims_user.identity < 2 {
         return Err(AppError::UserMissPermission);
     }
     let pool = get_pool().await;
 
-    let sql = "
-    upadte \"user\"
-    set user_status = 2
-    where user_id = $1
-    ";
-    let affected_row = sqlx::query(sql)
-        .bind(&user_id)
-        .execute(pool)
-        .await
-        .unwrap()
-        .rows_affected();
+    sql::user::delete_user(pool, &user_id).await?;
 
-    Ok(AppResponse::success(Some(affected_row)))
+    Ok(AppResponse::success(None))
 }

@@ -1,6 +1,7 @@
 mod app;
 mod model;
 mod route;
+mod sql;
 mod util;
 
 use util::config::CONFIG;

@@ -1,4 +1,7 @@
-use crate::util::{app_response::AppResponse, auth::ClaimsUser, redis::get_client, AppResult};
+use crate::{
+    model::user::ClaimsUser,
+    util::{app_response::AppResponse, redis::get_client, AppResult},
+};
 
 pub async fn logout(user: ClaimsUser) -> AppResult<Option<String>> {
     let client = get_client().await;

@@ -3,44 +3,11 @@ use axum::{
     extract::FromRequestParts,
     http::{header::AUTHORIZATION, request::Parts},
 };
-use chrono::{Duration, Utc};
 use jsonwebtoken::{decode, DecodingKey, EncodingKey, Header, Validation};
-use serde::{Deserialize, Serialize};
 
-use crate::model::user::User;
+use crate::model::user::ClaimsUser;
 
 use super::{app_error::AppError, config::CONFIG};
-
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct ClaimsUser {
-    pub exp: i64,
-    pub user_id: String,
-    pub user_name: String,
-    pub user_email: String,
-    pub avatar_url: String, // 头像 url
-    pub level: i16,         // 0
-    pub status: i16,        // 0. 正常 1. 被封禁 2. 删除
-    pub identity: i16,      // 0. 普通 1. 管理员 2. 超级管理员
-}
-
-impl ClaimsUser {
-    pub fn from(user: User) -> Self {
-        let user = user.clone();
-        let duration = CONFIG.auth.duration;
-        let start_time = Utc::now();
-        let end_time = start_time + Duration::hours(duration);
-        Self {
-            exp: end_time.timestamp(),
-            user_id: user.user_id,
-            user_name: user.user_name,
-            user_email: user.user_email,
-            avatar_url: user.avatar_url,
-            level: user.level,
-            status: user.status,
-            identity: user.identity,
-        }
-    }
-}
 
 pub async fn sign(claims_user: ClaimsUser) -> Result<String, AppError> {
     let secret = CONFIG.auth.secret.clone();

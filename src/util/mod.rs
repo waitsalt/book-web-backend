@@ -10,3 +10,4 @@ use app_error::AppError;
 use app_response::AppResponse;
 
 pub type AppResult<T> = std::result::Result<AppResponse<T>, AppError>;
+pub type Result<T> = std::result::Result<T, AppError>;
