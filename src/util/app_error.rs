@@ -15,16 +15,20 @@ pub enum AppError {
     UserPasswordError,
 
     // author
+    AuthorExist,
     AuthorNotExist,
 
     // book
+    BookExist,
     BookNotExist,
 
     // chapter
+    ChapterExist,
     ChapterNotExist,
 
     // auth
     InvalidToken,
+    MissToken,
 
     // sqlx
     SqlxError,
@@ -64,16 +68,20 @@ impl IntoResponse for AppError {
             AppError::UserPasswordError => (bad_request, 1008, "用户密码错误"),
 
             // author
+            AppError::AuthorExist => (bad_request, 1101, "作者已存在"),
             AppError::AuthorNotExist => (bad_request, 1101, "作者不存在"),
 
             // book
-            AppError::BookNotExist => (bad_request, 1201, "书籍不存在"),
+            AppError::BookExist => (bad_request, 1201, "书籍已存在"),
+            AppError::BookNotExist => (bad_request, 1202, "书籍不存在"),
 
             // chapter
-            AppError::ChapterNotExist => (bad_request, 1301, "章节不存在"),
+            AppError::ChapterExist => (bad_request, 1301, "章节已存在"),
+            AppError::ChapterNotExist => (bad_request, 1302, "章节不存在"),
 
             // auth
             AppError::InvalidToken => (bad_request, 2001, "无效的 token"),
+            AppError::MissToken => (bad_request, 2002, "用户未登陆"),
 
             // sqlx
             AppError::SqlxError => (bad_request, 3001, "sql 出现问题"),

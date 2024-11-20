@@ -5,32 +5,6 @@ use crate::{
     util::{app_error::AppError, Result},
 };
 
-pub async fn query_author_is_exist(
-    pool: &Pool<Postgres>,
-    author_name: &str,
-    platform: &str,
-) -> Result<()> {
-    let sql = "
-        select
-            author_id, author_name
-        from
-            author
-        where
-            author_name = $1
-        and
-            platform = $2;";
-    let res: Option<(i32, i32)> = sqlx::query_as(sql)
-        .bind(author_name)
-        .bind(platform)
-        .fetch_optional(pool)
-        .await?;
-    match res {
-        Some(_) => {}
-        None => return Err(AppError::AuthorNotExist),
-    }
-    Ok(())
-}
-
 pub async fn create_author(pool: &Pool<Postgres>, author_name: &str, platform: &str) -> Result<()> {
     let sql = "
         insert into

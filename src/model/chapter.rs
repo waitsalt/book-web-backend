@@ -19,10 +19,10 @@ pub struct Chapter {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CreateChapterPayload {
-    pub book_id: i32,
     pub book_name: String,
     pub roll_id: i16,
     pub roll_name: String,
+    pub chapter_id: i32,
     pub chapter_name: String,
     pub chapter_content: String,
 }

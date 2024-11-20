@@ -24,7 +24,7 @@ pub async fn create_book(
         insert into
             book (book_name, author_id, author_name, platform, user_id, user_name, cover_url, source_url, book_tags, book_desc, book_class, book_status)
         values
-            ($1, $1, $1, $1, $1, $1, $1, $1, $1, $10, $11, $12);";
+            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);";
     let _ = sqlx::query(sql)
         .bind(book_name)
         .bind(author_id)
@@ -54,6 +54,32 @@ pub async fn get_book_info_by_id(pool: &Pool<Postgres>, book_id: &i32) -> Result
         book_id = $1";
     let res: Option<Book> = sqlx::query_as(sql)
         .bind(book_id)
+        .fetch_optional(pool)
+        .await
+        .unwrap();
+    match res {
+        Some(book) => Ok(book),
+        None => Err(AppError::BookNotExist),
+    }
+}
+
+pub async fn get_book_info_by_book_name_with_author_id(
+    pool: &Pool<Postgres>,
+    book_name: &str,
+    author_id: &i32,
+) -> Result<Book> {
+    let sql = "
+    select
+        *
+    from
+        book
+    where
+        book_name = $1
+    and
+        author_id = $2;";
+    let res: Option<Book> = sqlx::query_as(sql)
+        .bind(book_name)
+        .bind(author_id)
         .fetch_optional(pool)
         .await
         .unwrap();
