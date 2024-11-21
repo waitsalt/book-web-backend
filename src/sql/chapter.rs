@@ -40,6 +40,22 @@ pub async fn create_chapter(
     Ok(())
 }
 
+pub async fn get_all_chapter(pool: &Pool<Postgres>, book_id: &i32) -> Result<Vec<(i32, String)>> {
+    let sql = "
+        select
+            chapter_id,chapter_name
+        from
+            chapter
+        where
+            book_id = $1;";
+    let chapter_info_list: Vec<(i32, String)> = sqlx::query_as(sql)
+        .bind(book_id)
+        .fetch_all(pool)
+        .await
+        .unwrap();
+    Ok(chapter_info_list)
+}
+
 pub async fn get_chapter_info(
     pool: &Pool<Postgres>,
     book_id: &i32,

@@ -1,4 +1,4 @@
-CREATE TABLE "user" (
+create table "user" (
     user_id serial primary key,
     user_name text not null unique,
     user_password text not null,
@@ -18,18 +18,15 @@ values
 
 create table author (
     author_id serial primary key,
-    author_name text not null unique,
+    author_name text not null,
     platform text default '',
     create_time timestamp with time zone not null default now(),
     update_time timestamp with time zone not null default now()
 );
 
-insert into
-    author (author_name)
-values
-    ('author_name_1');
+create unique index author_index_author_name_platform on author (author_name, platform);
 
-CREATE TABLE book (
+create table book (
     book_id serial primary key,
     book_name text not null,
     author_id int,
@@ -51,18 +48,7 @@ CREATE TABLE book (
     foreign key (author_id) references author (author_id)
 );
 
-create index book_index_book_name on book (book_name, author_id);
-
-insert into
-    book (
-        book_name,
-        author_id,
-        author_name,
-        user_id,
-        user_name
-    )
-values
-    ('book_name_1', 1, 'author_name_1', 1, 'root');
+create unique index book_index_book_name on book (book_name, author_name, platform);
 
 create table chapter (
     book_id int,
@@ -81,24 +67,3 @@ create table chapter (
     foreign key (author_id) references author (author_id),
     primary key (book_id, chapter_id)
 );
-
-insert into
-    chapter (
-        book_id,
-        book_name,
-        author_id,
-        author_name,
-        chapter_id,
-        chapter_name,
-        chapter_content
-    )
-values
-    (
-        1,
-        'book_name_1',
-        1,
-        'author_name_1',
-        1,
-        'chapter_name_1',
-        'chapter_content_1'
-    );

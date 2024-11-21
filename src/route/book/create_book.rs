@@ -70,5 +70,39 @@ pub async fn create_book(
         &create_book_payload.book_status,
     )
     .await?;
+
+    let chapter_content = format!(
+        "书名:{}\n作者:{}\n状态:{}\n类别:{}\n标签:{}\n简介:{}\n来源:{}",
+        create_book_payload.book_name,
+        create_book_payload.author_name,
+        create_book_payload.book_status,
+        create_book_payload.book_class,
+        create_book_payload.book_tags,
+        create_book_payload.book_desc,
+        create_book_payload.source_url
+    );
+
+    let book = sql::book::get_book_info_by_book_name_with_author_id(
+        pool,
+        &create_book_payload.book_name,
+        &author.author_id,
+    )
+    .await?;
+
+    // 建立
+    sql::chapter::create_chapter(
+        pool,
+        &book.book_id,
+        &book.book_name,
+        &book.author_id,
+        &book.author_name,
+        &book.platform,
+        &0,
+        "正文",
+        &0,
+        "书籍说明",
+        &chapter_content,
+    )
+    .await?;
     Ok(AppResponse::success(None))
 }

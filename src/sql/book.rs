@@ -44,6 +44,16 @@ pub async fn create_book(
     Ok(())
 }
 
+pub async fn get_all_book(pool: &Pool<Postgres>) -> Result<Vec<Book>> {
+    let sql = "
+    select
+        *
+    from
+        book;";
+    let books: Vec<Book> = sqlx::query_as(sql).fetch_all(pool).await.unwrap();
+    Ok(books)
+}
+
 pub async fn get_book_info_by_id(pool: &Pool<Postgres>, book_id: &i32) -> Result<Book> {
     let sql = "
     select
@@ -87,4 +97,63 @@ pub async fn get_book_info_by_book_name_with_author_id(
         Some(book) => Ok(book),
         None => Err(AppError::BookNotExist),
     }
+}
+
+pub async fn search_book_by_book_name(pool: &Pool<Postgres>, book_name: &str) -> Result<Vec<Book>> {
+    let book_name = format!("%{}%", book_name);
+    let sql = "
+        select
+            *
+        from
+            book
+        where
+            book_name like $1;";
+    let books: Vec<Book> = sqlx::query_as(sql)
+        .bind(&book_name)
+        .fetch_all(pool)
+        .await
+        .unwrap();
+    Ok(books)
+}
+
+pub async fn search_book_by_author_name(
+    pool: &Pool<Postgres>,
+    author_name: &str,
+) -> Result<Vec<Book>> {
+    let author_name = format!("%{}%", author_name);
+    let sql = "
+        select
+            *
+        from
+            book
+        where
+            author_name like $1;";
+    let books: Vec<Book> = sqlx::query_as(sql)
+        .bind(&author_name)
+        .fetch_all(pool)
+        .await
+        .unwrap();
+    Ok(books)
+}
+
+pub async fn search_book_by_book_name_or_author_name(
+    pool: &Pool<Postgres>,
+    keyword: &str,
+) -> Result<Vec<Book>> {
+    let keyword = format!("%{}%", keyword);
+    let sql = "
+        select
+            *
+        from
+            book
+        where
+            book_name like $1
+        or
+            author_name like $1;";
+    let books: Vec<Book> = sqlx::query_as(sql)
+        .bind(&keyword)
+        .fetch_all(pool)
+        .await
+        .unwrap();
+    Ok(books)
 }

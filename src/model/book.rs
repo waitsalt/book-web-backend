@@ -34,3 +34,9 @@ pub struct CreateBookPayload {
     pub book_class: String,
     pub book_status: String,
 }
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct SearchBookPayload {
+    pub sort: String, // author book all
+    pub keyword: String,
+}
