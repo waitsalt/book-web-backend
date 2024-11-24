@@ -11,6 +11,10 @@ pub async fn init() {
     assert!(CLIENT.set(client).is_ok(), "redis init error");
 }
 
-pub async fn get_client() -> &'static redis::Client {
-    CLIENT.get().expect("redis client get error")
+pub async fn get_redis_connect() -> redis::Connection {
+    CLIENT
+        .get()
+        .expect("redis client get error")
+        .get_connection()
+        .expect("redis connect get error")
 }

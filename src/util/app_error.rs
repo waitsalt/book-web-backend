@@ -26,9 +26,14 @@ pub enum AppError {
     ChapterExist,
     ChapterNotExist,
 
+    // email
+    EmailSendFail,
+
     // auth
-    InvalidToken,
-    MissToken,
+    TokenInvalid,
+    TokenMiss,
+    CaptchaImageError,
+    CaptchaEmailError,
 
     // sqlx
     SqlxError,
@@ -79,9 +84,14 @@ impl IntoResponse for AppError {
             AppError::ChapterExist => (bad_request, 1301, "章节已存在"),
             AppError::ChapterNotExist => (bad_request, 1302, "章节不存在"),
 
+            // email
+            AppError::EmailSendFail => (bad_request, 1401, "邮件未发送成功"),
+
             // auth
-            AppError::InvalidToken => (bad_request, 2001, "无效的 token"),
-            AppError::MissToken => (bad_request, 2002, "用户未登陆"),
+            AppError::TokenInvalid => (bad_request, 2001, "无效的 token"),
+            AppError::TokenMiss => (bad_request, 2002, "用户未登陆"),
+            AppError::CaptchaEmailError => (bad_request, 2003, "邮箱验证码错误"),
+            AppError::CaptchaImageError => (bad_request, 2004, "图形验证码错误"),
 
             // sqlx
             AppError::SqlxError => (bad_request, 3001, "sql 出现问题"),

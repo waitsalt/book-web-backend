@@ -4,7 +4,8 @@ use crate::{
     model::{book::CreateBookPayload, user::ClaimsUser},
     sql,
     util::{
-        app_error::AppError, app_response::AppResponse, auth::check, database::get_pool, AppResult,
+        app_error::AppError, app_response::AppResponse, auth::check_admin, database::get_pool,
+        AppResult,
     },
 };
 
@@ -12,7 +13,7 @@ pub async fn create_book(
     claims_user_opt: Option<ClaimsUser>,
     Json(create_book_payload): Json<CreateBookPayload>,
 ) -> AppResult<String> {
-    let claims_user = check(claims_user_opt).await?;
+    let claims_user = check_admin(claims_user_opt).await?;
 
     let pool = get_pool().await;
 

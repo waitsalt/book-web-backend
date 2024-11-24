@@ -1,29 +1,22 @@
 use axum::Json;
-use serde::{Deserialize, Serialize};
 
 use crate::{
-    model::user::{ClaimsUser, User},
+    model::user::{ClaimsUser, SigninUserPayload, User},
     sql,
     util::{
         app_error::AppError, app_response::AppResponse, auth::sign, config::CONFIG,
-        database::get_pool, redis::get_client, AppResult,
+        database::get_pool, redis::get_redis_connect, AppResult,
     },
 };
 
-#[derive(Debug, Deserialize, Serialize)]
-pub struct AuthUserPayload {
-    pub user_name: String,
-    pub user_password: String,
-}
-
-pub async fn signin(Json(auth_user_payload): Json<AuthUserPayload>) -> AppResult<String> {
+pub async fn signin(Json(signin_user_payload): Json<SigninUserPayload>) -> AppResult<String> {
     let pool = get_pool().await;
 
-    let user = sql::user::get_user_info_by_name(pool, &auth_user_payload.user_name).await?;
+    let user = sql::user::get_user_info_by_name(pool, &signin_user_payload.user_name).await?;
 
     match user.status {
         0 => {
-            if user.user_password != auth_user_payload.user_password {
+            if user.user_password != signin_user_payload.user_password {
                 return Err(AppError::UserPasswordError);
             }
             auth(user).await
@@ -41,8 +34,7 @@ pub async fn signin(Json(auth_user_payload): Json<AuthUserPayload>) -> AppResult
 }
 
 async fn auth(user: User) -> AppResult<String> {
-    let client = get_client().await;
-    let mut con = client.get_connection().unwrap();
+    let mut con = get_redis_connect().await;
 
     let token_key = format!("token:{}", user.user_id);
 

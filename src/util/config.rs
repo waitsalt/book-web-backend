@@ -36,6 +36,14 @@ pub struct Logger {
 // }
 
 #[derive(Debug, Deserialize)]
+pub struct Email {
+    pub username: String,
+    pub password: String,
+    pub host: String,
+    pub port: u16,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct Config {
     pub auth: Auth,
     pub server: Server,
@@ -43,6 +51,7 @@ pub struct Config {
     pub redis: Redis,
     pub logger: Logger,
     // pub data: Data,
+    pub email: Email,
 }
 
 impl Config {

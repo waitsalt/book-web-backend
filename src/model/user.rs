@@ -18,11 +18,22 @@ pub struct User {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct SignupUserPayload {
+pub struct SigninUserPayload {
+    pub user_name: String,
+    pub user_password: String,
+    pub captcha_image_key: String,
+    pub captcha_image: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct CreateUserPayload {
     pub user_name: String,
     pub user_password: String,
     pub user_email: String,
     pub avatar_url: String,
+    pub captcha_email: String,
+    pub captcha_image_key: String,
+    pub captcha_image: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

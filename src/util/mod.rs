@@ -3,6 +3,7 @@ pub mod app_response;
 pub mod auth;
 pub mod config;
 pub mod database;
+pub mod email;
 pub mod logger;
 pub mod redis;
 

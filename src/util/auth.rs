@@ -20,7 +20,9 @@ pub async fn sign(claims_user: ClaimsUser) -> Result<String, AppError> {
     Ok(token)
 }
 
-pub async fn check(claims_user_opt: Option<ClaimsUser>) -> Result<ClaimsUser, AppError> {
+pub async fn check_super_admin(
+    claims_user_opt: Option<ClaimsUser>,
+) -> Result<ClaimsUser, AppError> {
     match claims_user_opt {
         Some(claims_user) => {
             if claims_user.identity < 2 {
@@ -29,7 +31,32 @@ pub async fn check(claims_user_opt: Option<ClaimsUser>) -> Result<ClaimsUser, Ap
             return Ok(claims_user);
         }
         None => {
-            return Err(AppError::MissToken);
+            return Err(AppError::TokenMiss);
+        }
+    }
+}
+
+pub async fn check_admin(claims_user_opt: Option<ClaimsUser>) -> Result<ClaimsUser, AppError> {
+    match claims_user_opt {
+        Some(claims_user) => {
+            if claims_user.identity < 1 {
+                return Err(AppError::UserMissPermission);
+            }
+            return Ok(claims_user);
+        }
+        None => {
+            return Err(AppError::TokenMiss);
+        }
+    }
+}
+
+pub async fn check_user(claims_user_opt: Option<ClaimsUser>) -> Result<ClaimsUser, AppError> {
+    match claims_user_opt {
+        Some(claims_user) => {
+            return Ok(claims_user);
+        }
+        None => {
+            return Err(AppError::TokenMiss);
         }
     }
 }
@@ -67,7 +94,7 @@ where
                 .unwrap();
                 Ok(token_data.claims)
             }
-            None => Err(AppError::InvalidToken),
+            None => Err(AppError::TokenInvalid),
         }
     }
 }

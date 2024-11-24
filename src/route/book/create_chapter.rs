@@ -4,7 +4,8 @@ use crate::{
     model::{chapter::CreateChapterPayload, user::ClaimsUser},
     sql,
     util::{
-        app_error::AppError, app_response::AppResponse, auth::check, database::get_pool, AppResult,
+        app_error::AppError, app_response::AppResponse, auth::check_admin, database::get_pool,
+        AppResult,
     },
 };
 
@@ -13,7 +14,7 @@ pub async fn create_chapter(
     Path(book_id): Path<i32>,
     Json(create_chapter_payload): Json<CreateChapterPayload>,
 ) -> AppResult<String> {
-    let _claims_user = check(claims_user_opt).await?;
+    let _claims_user = check_admin(claims_user_opt).await?;
     let pool = get_pool().await;
 
     // 获取书籍信息
