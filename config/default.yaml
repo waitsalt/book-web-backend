@@ -18,8 +18,8 @@ auth:
     duration: 3
 
 email:
-    username: "2302856934@qq.com"
-    password: "sleckrjznpzhebge"
-    host: "smtp.qq.com"
+    username: "xxxxxx@xx.xx"
+    password: "xxxxx"
+    host: "xxxx"
     port: 587
     

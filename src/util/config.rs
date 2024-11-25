@@ -58,6 +58,7 @@ impl Config {
     pub fn init() -> Result<Self, config::ConfigError> {
         let mut builder = config::Config::builder()
             .add_source(config::File::with_name("config/default"))
+            .add_source(config::File::with_name("config/user"))
             .add_source(config::Environment::default().separator("_"));
         if let Ok(port) = env::var("PORT") {
             builder = builder.set_override("server.port", port)?;
