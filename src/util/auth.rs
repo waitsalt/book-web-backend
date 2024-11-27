@@ -6,7 +6,7 @@ use axum::{
 use chrono::Utc;
 use jsonwebtoken::{decode, DecodingKey, EncodingKey, Header, Validation};
 
-use crate::model::user::ClaimsUser;
+use crate::model::user::{ClaimsUser, RefreshClaimsUser};
 
 use super::{app_error::AppError, config::CONFIG};
 
@@ -21,12 +21,23 @@ pub async fn sign(claims_user: ClaimsUser) -> Result<String, AppError> {
     Ok(token)
 }
 
+pub async fn refresh_sign(refresh_claims_user: RefreshClaimsUser) -> Result<String, AppError> {
+    let secret = CONFIG.auth.secret.clone();
+    let token = jsonwebtoken::encode(
+        &Header::default(),
+        &refresh_claims_user,
+        &EncodingKey::from_secret(secret.as_bytes()),
+    )
+    .unwrap();
+    Ok(token)
+}
+
 pub async fn check_user_status(claims_user: ClaimsUser) -> Result<ClaimsUser, AppError> {
     let local_time = Utc::now().timestamp();
     if local_time < claims_user.exp {
         return Err(AppError::TokenInvalid);
     }
-    match claims_user.status {
+    match claims_user.user_info.status {
         0 => {
             return Ok(claims_user);
         }
@@ -97,6 +108,44 @@ where
             Some(token) => {
                 let secret = CONFIG.auth.secret.clone();
                 let token_data = decode::<ClaimsUser>(
+                    &token,
+                    &DecodingKey::from_secret(secret.as_bytes()),
+                    &Validation::default(),
+                )
+                .unwrap();
+                Ok(token_data.claims)
+            }
+            None => Err(AppError::TokenInvalid),
+        }
+    }
+}
+
+#[async_trait]
+impl<S> FromRequestParts<S> for RefreshClaimsUser
+where
+    S: Send + Sync,
+{
+    type Rejection = AppError;
+
+    async fn from_request_parts<'life0, 'life1>(
+        parts: &'life0 mut Parts,
+        _state: &'life1 S,
+    ) -> Result<Self, Self::Rejection>
+    where
+        'life0: 'async_trait,
+        'life1: 'async_trait,
+        Self: 'async_trait,
+    {
+        let res = parts
+            .headers
+            .get(AUTHORIZATION)
+            .and_then(|value| value.to_str().ok())
+            .and_then(|value| value.strip_prefix("Bearer "))
+            .map(|token| token.to_string());
+        match res {
+            Some(token) => {
+                let secret = CONFIG.auth.secret.clone();
+                let token_data = decode::<RefreshClaimsUser>(
                     &token,
                     &DecodingKey::from_secret(secret.as_bytes()),
                     &Validation::default(),

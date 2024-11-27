@@ -7,7 +7,8 @@ pub static CONFIG: Lazy<Config> = Lazy::new(|| Config::init().expect("config ini
 #[derive(Debug, Deserialize)]
 pub struct Auth {
     pub secret: String,
-    pub duration: i64,
+    pub refresh_token_duration: i64,
+    pub access_token_duration: i64,
 }
 
 #[derive(Debug, Deserialize)]

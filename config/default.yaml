@@ -15,7 +15,8 @@ data:
 
 auth:
     secret: "123456"
-    duration: 3
+    access_token_duration: 15
+    refresh_token_duration: 30
 
 email:
     username: "xxxxxx@xx.xx"

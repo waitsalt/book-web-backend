@@ -36,7 +36,7 @@ pub struct CreateUserPayload {
     pub captcha_image: String,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct PublicUser {
     pub user_id: i32,
     pub user_name: String,
@@ -68,31 +68,42 @@ impl PublicUser {
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ClaimsUser {
+    pub iat: i64,
     pub exp: i64,
-    pub user_id: i32,
-    pub user_name: String,
-    pub user_email: String,
-    pub avatar_url: String, // 头像 url
-    pub level: i16,         // 0
-    pub status: i16,        // 0. 正常 1. 被封禁 2. 删除
-    pub identity: i16,      // 0. 普通 1. 管理员 2. 超级管理员
+    pub user_info: PublicUser,
 }
 
 impl ClaimsUser {
     pub fn from(user: User) -> Self {
         let user = user.clone();
-        let duration = CONFIG.auth.duration;
+        let duration = CONFIG.auth.access_token_duration;
         let start_time = Utc::now();
-        let end_time = start_time + Duration::hours(duration);
+        let end_time = start_time + Duration::minutes(duration);
         Self {
+            iat: start_time.timestamp(),
+            exp: end_time.timestamp(),
+            user_info: PublicUser::from(user),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct RefreshClaimsUser {
+    pub iat: i64,
+    pub exp: i64,
+    pub user_id: i32,
+}
+
+impl RefreshClaimsUser {
+    pub fn from(user: User) -> Self {
+        let user = user.clone();
+        let duration = CONFIG.auth.refresh_token_duration;
+        let start_time = Utc::now();
+        let end_time = start_time + Duration::days(duration);
+        Self {
+            iat: start_time.timestamp(),
             exp: end_time.timestamp(),
             user_id: user.user_id,
-            user_name: user.user_name,
-            user_email: user.user_email,
-            avatar_url: user.avatar_url,
-            level: user.level,
-            status: user.status,
-            identity: user.identity,
         }
     }
 }

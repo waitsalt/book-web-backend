@@ -11,6 +11,6 @@ pub struct CaptchaRes {
 }
 
 pub async fn captcha_image(Path(captcha_image_key): Path<String>) -> AppResult<String> {
-    let a = Captcha::new(5, 130, 40);
+    let a = Captcha::new(5, 100, 40);
     Ok(AppResponse::success(Some(a.base_img)))
 }

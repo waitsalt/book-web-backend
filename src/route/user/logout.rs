@@ -6,7 +6,7 @@ use crate::{
 pub async fn logout(user: ClaimsUser) -> AppResult<Option<String>> {
     let mut con = get_redis_connect().await;
 
-    let user_id = user.user_id;
+    let user_id = user.user_info.user_id;
 
     let token_key = format!("token:{}", user_id);
 
