@@ -1,7 +1,7 @@
 use axum::Json;
 
 use crate::{
-    model::user::CreateUserPayload,
+    model::user::UserSignupPayload,
     sql,
     util::{
         app_error::AppError, app_response::AppResponse, database::get_pool,
@@ -9,7 +9,7 @@ use crate::{
     },
 };
 
-pub async fn signup(Json(create_user_payload): Json<CreateUserPayload>) -> AppResult<String> {
+pub async fn signup(Json(create_user_payload): Json<UserSignupPayload>) -> AppResult<String> {
     let pool = get_pool().await;
     // 查询用户名是否存在
     sql::user::query_user_name_is_exist(pool, &create_user_payload.user_name).await?;

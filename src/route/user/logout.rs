@@ -1,9 +1,9 @@
 use crate::{
-    model::user::ClaimsUser,
+    model::user::UserClaims,
     util::{app_response::AppResponse, redis::get_redis_connect, AppResult},
 };
 
-pub async fn logout(user: ClaimsUser) -> AppResult<Option<String>> {
+pub async fn logout(user: UserClaims) -> AppResult<Option<String>> {
     let mut con = get_redis_connect().await;
 
     let user_id = user.user_info.user_id;

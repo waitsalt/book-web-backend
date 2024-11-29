@@ -6,11 +6,11 @@ use axum::{
 use chrono::Utc;
 use jsonwebtoken::{decode, DecodingKey, EncodingKey, Header, Validation};
 
-use crate::model::user::{ClaimsUser, RefreshClaimsUser};
+use crate::model::user::{UserClaims, UserRefreshClaims};
 
 use super::{app_error::AppError, config::CONFIG};
 
-pub async fn sign(claims_user: ClaimsUser) -> Result<String, AppError> {
+pub async fn sign(claims_user: UserClaims) -> Result<String, AppError> {
     let secret = CONFIG.auth.secret.clone();
     let token = jsonwebtoken::encode(
         &Header::default(),
@@ -21,7 +21,7 @@ pub async fn sign(claims_user: ClaimsUser) -> Result<String, AppError> {
     Ok(token)
 }
 
-pub async fn refresh_sign(refresh_claims_user: RefreshClaimsUser) -> Result<String, AppError> {
+pub async fn refresh_sign(refresh_claims_user: UserRefreshClaims) -> Result<String, AppError> {
     let secret = CONFIG.auth.secret.clone();
     let token = jsonwebtoken::encode(
         &Header::default(),
@@ -32,7 +32,7 @@ pub async fn refresh_sign(refresh_claims_user: RefreshClaimsUser) -> Result<Stri
     Ok(token)
 }
 
-pub async fn check_user_status(claims_user: ClaimsUser) -> Result<ClaimsUser, AppError> {
+pub async fn check_user_status(claims_user: UserClaims) -> Result<UserClaims, AppError> {
     let local_time = Utc::now().timestamp();
     if local_time < claims_user.exp {
         return Err(AppError::TokenInvalid);
@@ -54,8 +54,8 @@ pub async fn check_user_status(claims_user: ClaimsUser) -> Result<ClaimsUser, Ap
 }
 
 pub async fn check_super_admin(
-    claims_user_opt: Option<ClaimsUser>,
-) -> Result<ClaimsUser, AppError> {
+    claims_user_opt: Option<UserClaims>,
+) -> Result<UserClaims, AppError> {
     match claims_user_opt {
         Some(claims_user) => check_user_status(claims_user).await,
         None => {
@@ -64,7 +64,7 @@ pub async fn check_super_admin(
     }
 }
 
-pub async fn check_admin(claims_user_opt: Option<ClaimsUser>) -> Result<ClaimsUser, AppError> {
+pub async fn check_admin(claims_user_opt: Option<UserClaims>) -> Result<UserClaims, AppError> {
     match claims_user_opt {
         Some(claims_user) => check_user_status(claims_user).await,
         None => {
@@ -73,7 +73,7 @@ pub async fn check_admin(claims_user_opt: Option<ClaimsUser>) -> Result<ClaimsUs
     }
 }
 
-pub async fn check_user(claims_user_opt: Option<ClaimsUser>) -> Result<ClaimsUser, AppError> {
+pub async fn check_user(claims_user_opt: Option<UserClaims>) -> Result<UserClaims, AppError> {
     match claims_user_opt {
         Some(claims_user) => check_user_status(claims_user).await,
         None => {
@@ -83,7 +83,7 @@ pub async fn check_user(claims_user_opt: Option<ClaimsUser>) -> Result<ClaimsUse
 }
 
 #[async_trait]
-impl<S> FromRequestParts<S> for ClaimsUser
+impl<S> FromRequestParts<S> for UserClaims
 where
     S: Send + Sync,
 {
@@ -107,7 +107,7 @@ where
         match res {
             Some(token) => {
                 let secret = CONFIG.auth.secret.clone();
-                let token_data = decode::<ClaimsUser>(
+                let token_data = decode::<UserClaims>(
                     &token,
                     &DecodingKey::from_secret(secret.as_bytes()),
                     &Validation::default(),
@@ -121,7 +121,7 @@ where
 }
 
 #[async_trait]
-impl<S> FromRequestParts<S> for RefreshClaimsUser
+impl<S> FromRequestParts<S> for UserRefreshClaims
 where
     S: Send + Sync,
 {
@@ -145,7 +145,7 @@ where
         match res {
             Some(token) => {
                 let secret = CONFIG.auth.secret.clone();
-                let token_data = decode::<RefreshClaimsUser>(
+                let token_data = decode::<UserRefreshClaims>(
                     &token,
                     &DecodingKey::from_secret(secret.as_bytes()),
                     &Validation::default(),

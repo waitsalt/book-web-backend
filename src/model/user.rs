@@ -18,7 +18,7 @@ pub struct User {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct SigninUserPayload {
+pub struct UserSigninPayload {
     pub user_name: String,
     pub user_password: String,
     pub captcha_image_key: String,
@@ -26,7 +26,7 @@ pub struct SigninUserPayload {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct CreateUserPayload {
+pub struct UserSignupPayload {
     pub user_name: String,
     pub user_password: String,
     pub user_email: String,
@@ -37,7 +37,7 @@ pub struct CreateUserPayload {
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
-pub struct PublicUser {
+pub struct UserPublic {
     pub user_id: i32,
     pub user_name: String,
     pub user_email: String,
@@ -49,7 +49,7 @@ pub struct PublicUser {
     pub update_time: DateTime<Utc>,
 }
 
-impl PublicUser {
+impl UserPublic {
     pub fn from(user: User) -> Self {
         let user = user.clone();
         Self {
@@ -67,13 +67,13 @@ impl PublicUser {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct ClaimsUser {
+pub struct UserClaims {
     pub iat: i64,
     pub exp: i64,
-    pub user_info: PublicUser,
+    pub user_info: UserPublic,
 }
 
-impl ClaimsUser {
+impl UserClaims {
     pub fn from(user: User) -> Self {
         let user = user.clone();
         let duration = CONFIG.auth.access_token_duration;
@@ -82,19 +82,19 @@ impl ClaimsUser {
         Self {
             iat: start_time.timestamp(),
             exp: end_time.timestamp(),
-            user_info: PublicUser::from(user),
+            user_info: UserPublic::from(user),
         }
     }
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct RefreshClaimsUser {
+pub struct UserRefreshClaims {
     pub iat: i64,
     pub exp: i64,
     pub user_id: i32,
 }
 
-impl RefreshClaimsUser {
+impl UserRefreshClaims {
     pub fn from(user: User) -> Self {
         let user = user.clone();
         let duration = CONFIG.auth.refresh_token_duration;
@@ -104,6 +104,21 @@ impl RefreshClaimsUser {
             iat: start_time.timestamp(),
             exp: end_time.timestamp(),
             user_id: user.user_id,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct UserAuth {
+    pub access_token: String,
+    pub refresh_token: String,
+}
+
+impl UserAuth {
+    pub fn new(access_token: String, refresh_token: String) -> Self {
+        Self {
+            access_token: access_token,
+            refresh_token: refresh_token,
         }
     }
 }

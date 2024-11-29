@@ -1,7 +1,8 @@
 use axum::Json;
+use redis::Commands;
 
 use crate::{
-    model::user::{ClaimsUser, RefreshClaimsUser, SigninUserPayload, User},
+    model::user::{User, UserAuth, UserClaims, UserRefreshClaims, UserSigninPayload},
     sql,
     util::{
         app_error::AppError,
@@ -14,9 +15,19 @@ use crate::{
     },
 };
 
-pub async fn signin(
-    Json(signin_user_payload): Json<SigninUserPayload>,
-) -> AppResult<(String, String)> {
+pub async fn signin(Json(signin_user_payload): Json<UserSigninPayload>) -> AppResult<UserAuth> {
+    let mut con = get_redis_connect().await;
+
+    let captcha_image_key = format!(
+        "captcha_image_key:{}",
+        signin_user_payload.captcha_image_key
+    );
+    let captcha_image: String = con.get_del(captcha_image_key).unwrap();
+
+    if captcha_image != signin_user_payload.captcha_image {
+        return Err(AppError::CaptchaImageError);
+    }
+
     let pool = get_pool().await;
 
     let user = sql::user::get_user_info_by_name(pool, &signin_user_payload.user_name).await?;
@@ -40,12 +51,12 @@ pub async fn signin(
     }
 }
 
-async fn auth(user: User) -> AppResult<(String, String)> {
+async fn auth(user: User) -> AppResult<UserAuth> {
     let mut con = get_redis_connect().await;
 
     let refresh_token_key = format!("refresh_token:{}", user.user_id);
 
-    let refresh_token_string: String = match redis::cmd("GET")
+    let refresh_token: String = match redis::cmd("GET")
         .arg(refresh_token_key.clone())
         .query(&mut con)
     {
@@ -53,16 +64,16 @@ async fn auth(user: User) -> AppResult<(String, String)> {
         Err(_) => "".to_string(),
     };
 
-    let access_token = sign(ClaimsUser::from(user.clone())).await?;
+    let access_token = sign(UserClaims::from(user.clone())).await?;
 
-    if !refresh_token_string.is_empty() {
-        Ok(AppResponse::success(Some((
-            refresh_token_key,
+    if !refresh_token.is_empty() {
+        Ok(AppResponse::success(Some(UserAuth::new(
             access_token,
+            refresh_token,
         ))))
     } else {
         let refresh_token_duration = CONFIG.auth.refresh_token_duration;
-        let refresh_token = refresh_sign(RefreshClaimsUser::from(user)).await?;
+        let refresh_token = refresh_sign(UserRefreshClaims::from(user)).await?;
 
         let _: () = redis::cmd("SET")
             .arg(refresh_token_key)
@@ -71,6 +82,9 @@ async fn auth(user: User) -> AppResult<(String, String)> {
             .arg(refresh_token_duration * 3600 * 24)
             .query(&mut con)
             .unwrap();
-        Ok(AppResponse::success(Some((refresh_token, access_token))))
+        Ok(AppResponse::success(Some(UserAuth::new(
+            access_token,
+            refresh_token,
+        ))))
     }
 }

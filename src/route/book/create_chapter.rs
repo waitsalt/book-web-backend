@@ -1,7 +1,7 @@
 use axum::{extract::Path, Json};
 
 use crate::{
-    model::{chapter::CreateChapterPayload, user::ClaimsUser},
+    model::{chapter::CreateChapterPayload, user::UserClaims},
     sql,
     util::{
         app_error::AppError, app_response::AppResponse, auth::check_admin, database::get_pool,
@@ -10,7 +10,7 @@ use crate::{
 };
 
 pub async fn create_chapter(
-    claims_user_opt: Option<ClaimsUser>,
+    claims_user_opt: Option<UserClaims>,
     Path(book_id): Path<i32>,
     Json(create_chapter_payload): Json<CreateChapterPayload>,
 ) -> AppResult<String> {
