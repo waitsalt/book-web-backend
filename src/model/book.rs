@@ -10,6 +10,8 @@ pub struct Book {
     pub platform: String,
     pub user_id: i32,
     pub user_name: String,
+    pub manager_id: i32,
+    pub manager_name: String,
     pub cover_url: String,
     pub source_url: String,
     pub book_tags: String,
