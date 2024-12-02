@@ -1,7 +1,7 @@
 use axum::Json;
 
 use crate::{
-    model::book::{Book, SearchBookPayload},
+    model::book::{BookInfo, SearchBookPayload},
     sql::book::{
         search_book_by_author_name, search_book_by_book_name,
         search_book_by_book_name_or_author_name,
@@ -11,7 +11,7 @@ use crate::{
 
 pub async fn search_book(
     Json(search_book_payload): Json<SearchBookPayload>,
-) -> AppResult<Vec<Book>> {
+) -> AppResult<Vec<BookInfo>> {
     let pool = get_pool().await;
     match search_book_payload.sort.as_str() {
         "book_name" => {

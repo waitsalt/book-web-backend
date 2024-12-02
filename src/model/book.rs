@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize, sqlx::FromRow)]
-pub struct Book {
+pub struct BookInfo {
     pub book_id: i32,
     pub book_name: String,
     pub author_id: i32,

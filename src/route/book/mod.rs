@@ -6,6 +6,7 @@ mod get_all_book;
 mod get_all_chapter;
 mod get_book_info;
 mod get_chapter_info;
+mod latest_update_books;
 mod search_book;
 
 use axum::{
