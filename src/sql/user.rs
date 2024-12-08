@@ -136,3 +136,49 @@ pub async fn get_user_info_by_name(pool: &Pool<Postgres>, user_name: &str) -> Re
         }
     }
 }
+
+pub async fn update_base_info(
+    pool: &Pool<Postgres>,
+    user_id: &i32,
+    avatar_url: &str,
+    user_name: &str,
+) -> Result<()> {
+    let sql = "
+    update
+        \"user\"
+    set
+        avatar_url = $1
+    and
+        user_name = $2
+    where
+        user_id = $3";
+    let _ = sqlx::query(sql)
+        .bind(avatar_url)
+        .bind(user_name)
+        .bind(user_id)
+        .execute(pool)
+        .await
+        .unwrap();
+    Ok(())
+}
+
+pub async fn update_avatar_url(
+    pool: &Pool<Postgres>,
+    user_id: &i32,
+    avatar_url: &str,
+) -> Result<()> {
+    let sql = "
+    update
+        \"user\"
+    set
+        avatar_url = $1
+    where
+        user_id = $2";
+    let _ = sqlx::query(sql)
+        .bind(avatar_url)
+        .bind(user_id)
+        .execute(pool)
+        .await
+        .unwrap();
+    Ok(())
+}

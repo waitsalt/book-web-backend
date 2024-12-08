@@ -70,7 +70,7 @@ impl UserPublic {
 pub struct UserClaims {
     pub iat: i64,
     pub exp: i64,
-    pub user_info: UserPublic,
+    pub user_public: UserPublic,
 }
 
 impl UserClaims {
@@ -80,9 +80,9 @@ impl UserClaims {
         let start_time = Utc::now();
         let end_time = start_time + Duration::minutes(duration);
         Self {
-            iat: start_time.timestamp(),
-            exp: end_time.timestamp(),
-            user_info: UserPublic::from(user),
+            iat: start_time.timestamp_millis(),
+            exp: end_time.timestamp_millis(),
+            user_public: UserPublic::from(user),
         }
     }
 }
@@ -94,6 +94,12 @@ pub struct UserRefreshClaims {
     pub user_id: i32,
 }
 
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct UserBaseInfoPayload {
+    pub avatar_url: String,
+    pub user_name: String,
+}
+
 impl UserRefreshClaims {
     pub fn from(user: User) -> Self {
         let user = user.clone();
@@ -101,8 +107,8 @@ impl UserRefreshClaims {
         let start_time = Utc::now();
         let end_time = start_time + Duration::days(duration);
         Self {
-            iat: start_time.timestamp(),
-            exp: end_time.timestamp(),
+            iat: start_time.timestamp_millis(),
+            exp: end_time.timestamp_millis(),
             user_id: user.user_id,
         }
     }
@@ -121,4 +127,9 @@ impl UserAuth {
             refresh_token: refresh_token,
         }
     }
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct UserUpdateAvatarUrlPayload {
+    pub avatar_url: String,
 }

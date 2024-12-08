@@ -40,7 +40,7 @@ pub async fn create_chapter(
     Ok(())
 }
 
-pub async fn get_all_chapter(pool: &Pool<Postgres>, book_id: &i32) -> Result<Vec<(i32, String)>> {
+pub async fn get_chapter_list(pool: &Pool<Postgres>, book_id: &i32) -> Result<Vec<(i32, String)>> {
     let sql = "
         select
             chapter_id,chapter_name
@@ -56,7 +56,7 @@ pub async fn get_all_chapter(pool: &Pool<Postgres>, book_id: &i32) -> Result<Vec
     Ok(chapter_info_list)
 }
 
-pub async fn get_chapter_info(
+pub async fn get_chapter(
     pool: &Pool<Postgres>,
     book_id: &i32,
     chapter_id: &i32,

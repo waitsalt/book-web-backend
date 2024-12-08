@@ -1,7 +1,7 @@
 use axum::Json;
 
 use crate::{
-    model::{book::CreateBookPayload, user::UserClaims},
+    model::{book::BookCreatePayload, user::UserClaims},
     sql,
     util::{
         app_error::AppError, app_response::AppResponse, auth::check_admin, database::get_pool,
@@ -11,7 +11,7 @@ use crate::{
 
 pub async fn create_book(
     claims_user_opt: Option<UserClaims>,
-    Json(create_book_payload): Json<CreateBookPayload>,
+    Json(create_book_payload): Json<BookCreatePayload>,
 ) -> AppResult<String> {
     let claims_user = check_admin(claims_user_opt).await?;
 
@@ -61,8 +61,8 @@ pub async fn create_book(
         &author.author_id,
         &author.author_name,
         &author.platform,
-        &claims_user.user_info.user_id,
-        &claims_user.user_info.user_name,
+        &claims_user.user_public.user_id,
+        &claims_user.user_public.user_name,
         &create_book_payload.cover_url,
         &create_book_payload.source_url,
         &create_book_payload.book_tags,

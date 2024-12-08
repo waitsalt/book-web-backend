@@ -31,10 +31,10 @@ pub struct Logger {
     pub level: String,
 }
 
-// #[derive(Debug, Deserialize)]
-// pub struct Data {
-//     pub path: String,
-// }
+#[derive(Debug, Deserialize)]
+pub struct Data {
+    pub path: String,
+}
 
 #[derive(Debug, Deserialize)]
 pub struct Email {
@@ -51,7 +51,7 @@ pub struct Config {
     pub database: Database,
     pub redis: Redis,
     pub logger: Logger,
-    // pub data: Data,
+    pub data: Data,
     pub email: Email,
 }
 

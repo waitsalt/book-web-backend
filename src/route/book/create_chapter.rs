@@ -21,8 +21,7 @@ pub async fn create_chapter(
     let book = sql::book::get_book_info_by_id(pool, &book_id).await?;
 
     // 章节存在则返回报错
-    let res =
-        sql::chapter::get_chapter_info(pool, &book_id, &create_chapter_payload.chapter_id).await;
+    let res = sql::chapter::get_chapter(pool, &book_id, &create_chapter_payload.chapter_id).await;
     match res {
         Ok(_) => {
             return Err(AppError::ChapterExist);

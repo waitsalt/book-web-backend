@@ -3,9 +3,9 @@ mod create_chapter;
 mod delete_book;
 mod delete_chapter;
 mod get_all_book;
-mod get_all_chapter;
 mod get_book_info;
-mod get_chapter_info;
+mod get_chapter;
+mod get_chapter_list;
 mod latest_update_books;
 mod search_book;
 
@@ -13,6 +13,7 @@ use axum::{
     routing::{get, post},
     Router,
 };
+use latest_update_books::latest_update_books;
 
 pub async fn init() -> Router {
     Router::new()
@@ -25,11 +26,12 @@ pub async fn init() -> Router {
             "/:book_id",
             get(get_book_info::get_book_info).post(create_chapter::create_chapter),
         )
-        .route("/:book_id/chapters", get(get_all_chapter::get_all_chapter))
         .route(
-            "/:book_id/:chapter_id",
-            get(get_chapter_info::get_chapter_info),
+            "/:book_id/chapter_list",
+            get(get_chapter_list::get_chapter_list),
         )
+        .route("/:book_id/:chapter_id", get(get_chapter::get_chapter))
+        .route("/latest_update", get(latest_update_books))
 }
 
 // async fn book_root() -> &'static str {

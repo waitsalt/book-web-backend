@@ -1,7 +1,7 @@
 use sqlx::{Pool, Postgres};
 
 use crate::{
-    model::book::Book,
+    model::book::BookInfo,
     util::{app_error::AppError, Result},
 };
 
@@ -44,17 +44,17 @@ pub async fn create_book(
     Ok(())
 }
 
-pub async fn get_all_book(pool: &Pool<Postgres>) -> Result<Vec<Book>> {
+pub async fn get_all_book(pool: &Pool<Postgres>) -> Result<Vec<BookInfo>> {
     let sql = "
     select
         *
     from
         book;";
-    let books: Vec<Book> = sqlx::query_as(sql).fetch_all(pool).await.unwrap();
+    let books: Vec<BookInfo> = sqlx::query_as(sql).fetch_all(pool).await.unwrap();
     Ok(books)
 }
 
-pub async fn get_book_info_by_id(pool: &Pool<Postgres>, book_id: &i32) -> Result<Book> {
+pub async fn get_book_info_by_id(pool: &Pool<Postgres>, book_id: &i32) -> Result<BookInfo> {
     let sql = "
     select
         *
@@ -62,7 +62,7 @@ pub async fn get_book_info_by_id(pool: &Pool<Postgres>, book_id: &i32) -> Result
         book
     where
         book_id = $1";
-    let res: Option<Book> = sqlx::query_as(sql)
+    let res: Option<BookInfo> = sqlx::query_as(sql)
         .bind(book_id)
         .fetch_optional(pool)
         .await
@@ -77,7 +77,7 @@ pub async fn get_book_info_by_book_name_with_author_id(
     pool: &Pool<Postgres>,
     book_name: &str,
     author_id: &i32,
-) -> Result<Book> {
+) -> Result<BookInfo> {
     let sql = "
     select
         *
@@ -87,7 +87,7 @@ pub async fn get_book_info_by_book_name_with_author_id(
         book_name = $1
     and
         author_id = $2;";
-    let res: Option<Book> = sqlx::query_as(sql)
+    let res: Option<BookInfo> = sqlx::query_as(sql)
         .bind(book_name)
         .bind(author_id)
         .fetch_optional(pool)
@@ -99,7 +99,12 @@ pub async fn get_book_info_by_book_name_with_author_id(
     }
 }
 
-pub async fn search_book_by_book_name(pool: &Pool<Postgres>, book_name: &str) -> Result<Vec<Book>> {
+pub async fn search_book(
+    pool: &Pool<Postgres>,
+    book_name: &str,
+    author_name: &str,
+    platform: &str,
+) -> Result<Vec<BookInfo>> {
     let book_name = format!("%{}%", book_name);
     let sql = "
         select
@@ -107,51 +112,15 @@ pub async fn search_book_by_book_name(pool: &Pool<Postgres>, book_name: &str) ->
         from
             book
         where
-            book_name like $1;";
-    let books: Vec<Book> = sqlx::query_as(sql)
-        .bind(&book_name)
-        .fetch_all(pool)
-        .await
-        .unwrap();
-    Ok(books)
-}
-
-pub async fn search_book_by_author_name(
-    pool: &Pool<Postgres>,
-    author_name: &str,
-) -> Result<Vec<Book>> {
-    let author_name = format!("%{}%", author_name);
-    let sql = "
-        select
-            *
-        from
-            book
-        where
-            author_name like $1;";
-    let books: Vec<Book> = sqlx::query_as(sql)
-        .bind(&author_name)
-        .fetch_all(pool)
-        .await
-        .unwrap();
-    Ok(books)
-}
-
-pub async fn search_book_by_book_name_or_author_name(
-    pool: &Pool<Postgres>,
-    keyword: &str,
-) -> Result<Vec<Book>> {
-    let keyword = format!("%{}%", keyword);
-    let sql = "
-        select
-            *
-        from
-            book
-        where
             book_name like $1
-        or
-            author_name like $1;";
-    let books: Vec<Book> = sqlx::query_as(sql)
-        .bind(&keyword)
+        and
+            author_name like $2
+        and
+            platform like $3;";
+    let books: Vec<BookInfo> = sqlx::query_as(sql)
+        .bind(book_name)
+        .bind(author_name)
+        .bind(platform)
         .fetch_all(pool)
         .await
         .unwrap();

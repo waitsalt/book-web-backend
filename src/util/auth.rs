@@ -10,74 +10,77 @@ use crate::model::user::{UserClaims, UserRefreshClaims};
 
 use super::{app_error::AppError, config::CONFIG};
 
-pub async fn sign(claims_user: UserClaims) -> Result<String, AppError> {
+pub async fn sign(user_claims: UserClaims) -> Result<String, AppError> {
     let secret = CONFIG.auth.secret.clone();
     let token = jsonwebtoken::encode(
         &Header::default(),
-        &claims_user,
+        &user_claims,
         &EncodingKey::from_secret(secret.as_bytes()),
     )
     .unwrap();
     Ok(token)
 }
 
-pub async fn refresh_sign(refresh_claims_user: UserRefreshClaims) -> Result<String, AppError> {
+pub async fn refresh_sign(user_refresh_claims: UserRefreshClaims) -> Result<String, AppError> {
     let secret = CONFIG.auth.secret.clone();
     let token = jsonwebtoken::encode(
         &Header::default(),
-        &refresh_claims_user,
+        &user_refresh_claims,
         &EncodingKey::from_secret(secret.as_bytes()),
     )
     .unwrap();
     Ok(token)
 }
 
-pub async fn check_user_status(claims_user: UserClaims) -> Result<UserClaims, AppError> {
-    let local_time = Utc::now().timestamp();
-    if local_time < claims_user.exp {
-        return Err(AppError::TokenInvalid);
+pub async fn check_user_status(user_claims: UserClaims) -> Result<UserClaims, AppError> {
+    let local_time = Utc::now().timestamp_millis();
+    println!("{local_time}");
+    if local_time > user_claims.exp {
+        return Err(AppError::AccessTokenMiss);
     }
-    match claims_user.user_info.status {
-        0 => {
-            return Ok(claims_user);
+    match user_claims.user_public.status {
+        0 => Ok(user_claims),
+        1 => Err(AppError::UserBlocked),
+        2 => Err(AppError::UserDeleted),
+        _ => Err(AppError::Other),
+    }
+}
+
+pub async fn check_user(user_claims_opt: Option<UserClaims>) -> Result<UserClaims, AppError> {
+    match user_claims_opt {
+        Some(user_claims) => check_user_status(user_claims).await,
+        None => {
+            return Err(AppError::AccessTokenMiss);
         }
-        1 => {
-            return Err(AppError::UserBlocked);
+    }
+}
+
+pub async fn check_admin(user_claims_opt: Option<UserClaims>) -> Result<UserClaims, AppError> {
+    match user_claims_opt {
+        Some(user_claims) => {
+            if user_claims.user_public.identity < 1 {
+                return Err(AppError::UserMissPermission);
+            }
+            check_user_status(user_claims).await
         }
-        2 => {
-            return Err(AppError::UserDeleted);
-        }
-        _ => {
-            return Err(AppError::Other);
+        None => {
+            return Err(AppError::AccessTokenMiss);
         }
     }
 }
 
 pub async fn check_super_admin(
-    claims_user_opt: Option<UserClaims>,
+    user_claims_opt: Option<UserClaims>,
 ) -> Result<UserClaims, AppError> {
-    match claims_user_opt {
-        Some(claims_user) => check_user_status(claims_user).await,
-        None => {
-            return Err(AppError::TokenMiss);
+    match user_claims_opt {
+        Some(user_claims) => {
+            if user_claims.user_public.identity < 2 {
+                return Err(AppError::UserMissPermission);
+            }
+            check_user_status(user_claims).await
         }
-    }
-}
-
-pub async fn check_admin(claims_user_opt: Option<UserClaims>) -> Result<UserClaims, AppError> {
-    match claims_user_opt {
-        Some(claims_user) => check_user_status(claims_user).await,
         None => {
-            return Err(AppError::TokenMiss);
-        }
-    }
-}
-
-pub async fn check_user(claims_user_opt: Option<UserClaims>) -> Result<UserClaims, AppError> {
-    match claims_user_opt {
-        Some(claims_user) => check_user_status(claims_user).await,
-        None => {
-            return Err(AppError::TokenMiss);
+            return Err(AppError::AccessTokenMiss);
         }
     }
 }
@@ -115,7 +118,7 @@ where
                 .unwrap();
                 Ok(token_data.claims)
             }
-            None => Err(AppError::TokenInvalid),
+            None => Err(AppError::AccessTokenInvalid),
         }
     }
 }
@@ -153,7 +156,7 @@ where
                 .unwrap();
                 Ok(token_data.claims)
             }
-            None => Err(AppError::TokenInvalid),
+            None => Err(AppError::RefreshTokenInvalid),
         }
     }
 }

@@ -20,12 +20,15 @@ pub struct BookInfo {
     pub book_status: String,
     pub latest_chapter_id: i32,
     pub latest_chapter_name: String,
+    pub collect: i32,
+    pub recommend: i32,
+    pub read_time: i32,
     pub create_time: DateTime<Utc>,
     pub update_time: DateTime<Utc>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct CreateBookPayload {
+pub struct BookCreatePayload {
     pub book_name: String,
     pub author_name: String,
     pub platform: String,
@@ -38,7 +41,8 @@ pub struct CreateBookPayload {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct SearchBookPayload {
-    pub sort: String, // author book all
-    pub keyword: String,
+pub struct BookSearchPayload {
+    pub book_name: String,
+    pub author_name: String,
+    pub platform: String,
 }

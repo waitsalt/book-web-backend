@@ -30,8 +30,10 @@ pub enum AppError {
     EmailSendFail,
 
     // auth
-    TokenInvalid,
-    TokenMiss,
+    AccessTokenMiss,
+    AccessTokenInvalid,
+    RefreshTokenMiss,
+    RefreshTokenInvalid,
     CaptchaImageError,
     CaptchaEmailError,
 
@@ -88,10 +90,12 @@ impl IntoResponse for AppError {
             AppError::EmailSendFail => (bad_request, 1401, "邮件未发送成功"),
 
             // auth
-            AppError::TokenInvalid => (bad_request, 2001, "无效的 token"),
-            AppError::TokenMiss => (bad_request, 2002, "用户未登陆"),
-            AppError::CaptchaEmailError => (bad_request, 2003, "邮箱验证码错误"),
-            AppError::CaptchaImageError => (bad_request, 2004, "图形验证码错误"),
+            AppError::AccessTokenMiss => (bad_request, 2001, "access token miss"),
+            AppError::AccessTokenInvalid => (bad_request, 2002, "access token invalid"),
+            AppError::RefreshTokenMiss => (bad_request, 2003, "refresh token miss"),
+            AppError::RefreshTokenInvalid => (bad_request, 2004, "refresh token invalid"),
+            AppError::CaptchaEmailError => (bad_request, 2005, "邮箱验证码错误"),
+            AppError::CaptchaImageError => (bad_request, 2006, "图形验证码错误"),
 
             // sqlx
             AppError::SqlxError => (bad_request, 3001, "sql 出现问题"),

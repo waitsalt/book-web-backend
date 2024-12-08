@@ -1,10 +1,9 @@
-// mod create_user;
-// mod delete_user;
-// mod get_all_user;
-// mod get_user_info;
 mod logout;
+mod refresh_access_token;
 mod signin;
 mod signup;
+mod update_avatar_url;
+mod verify_access_token;
 
 use axum::{
     routing::{get, post},
@@ -13,15 +12,19 @@ use axum::{
 
 pub async fn init() -> Router {
     Router::new()
-        // .route(
-        //     "/",
-        //     get(get_all_user::get_all_user).post(create_user::create_user),
-        // )
-        // .route(
-        //     "/user_info",
-        //     get(get_user_info::query_user_info).delete(delete_user::delete_user),
-        // )
         .route("/signup", post(signup::signup))
         .route("/signin", post(signin::signin))
+        .route(
+            "/refresh_access_token",
+            get(refresh_access_token::refresh_access_token),
+        )
+        .route(
+            "/update_avatar_url",
+            post(update_avatar_url::update_avatar_url),
+        )
         .route("/logout", get(logout::logout))
+        .route(
+            "/verify_access_token",
+            get(verify_access_token::verify_access_token),
+        )
 }
