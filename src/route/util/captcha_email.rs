@@ -15,30 +15,24 @@ pub async fn captcha_email(Path(user_email): Path<String>) -> AppResult<()> {
     let host = CONFIG.email.host.clone();
     let port = CONFIG.email.port;
 
-    tracing::info!("config load");
-
-    let verification_code_key = format!("verification_code_key:{}", user_email);
-    let verification_code = nanoid::nanoid!(6);
-
-    tracing::info!("vode load");
+    let captcha_email_key = format!("captcha_email_key:{}", user_email);
+    let verify_code = nanoid::nanoid!(6);
 
     let mut con = get_redis_connect().await;
     let _: () = redis::cmd("SET")
-        .arg(verification_code_key)
-        .arg(verification_code.clone())
+        .arg(captcha_email_key)
+        .arg(verify_code.clone())
         .arg("EX")
         .arg(5 * 60)
         .query(&mut con)
         .unwrap();
-
-    tracing::info!("start send message");
 
     let message = Message::builder()
         .from(email_send.parse().unwrap())
         .to(user_email.parse().unwrap())
         .subject("验证码")
         .header(ContentType::TEXT_PLAIN)
-        .body("你的验证码是 ".to_string() + verification_code.as_str())
+        .body("你的验证码是 ".to_string() + verify_code.as_str())
         .unwrap();
     let creds = Credentials::new(email_send.to_owned(), password.to_owned());
 

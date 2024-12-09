@@ -64,7 +64,6 @@ impl Config {
         if let Ok(port) = env::var("PORT") {
             builder = builder.set_override("server.port", port)?;
         }
-
         builder.build()?.try_deserialize()
     }
 }

@@ -46,3 +46,10 @@ pub struct BookSearchPayload {
     pub author_name: String,
     pub platform: String,
 }
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct BookVerifyPayload {
+    pub book_name: String,
+    pub author_name: String,
+    pub platform: String,
+}

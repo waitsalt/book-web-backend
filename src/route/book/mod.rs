@@ -8,6 +8,7 @@ mod get_chapter;
 mod get_chapter_list;
 mod latest_update_books;
 mod search_book;
+mod verify_book;
 
 use axum::{
     routing::{get, post},
@@ -32,6 +33,7 @@ pub async fn init() -> Router {
         )
         .route("/:book_id/:chapter_id", get(get_chapter::get_chapter))
         .route("/latest_update", get(latest_update_books))
+        .route("/verify_book", post(verify_book::verify_book))
 }
 
 // async fn book_root() -> &'static str {

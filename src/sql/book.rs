@@ -126,3 +126,30 @@ pub async fn search_book(
         .unwrap();
     Ok(books)
 }
+
+pub async fn verify_book(
+    pool: &Pool<Postgres>,
+    book_name: &str,
+    author_name: &str,
+    platform: &str,
+) -> Result<Vec<BookInfo>> {
+    let sql = "
+        select
+            *
+        from
+            book
+        where
+            book_name = $1
+        and
+            author_name = $2
+        and
+            platform = $3;";
+    let books: Vec<BookInfo> = sqlx::query_as(sql)
+        .bind(book_name)
+        .bind(author_name)
+        .bind(platform)
+        .fetch_all(pool)
+        .await
+        .unwrap();
+    Ok(books)
+}

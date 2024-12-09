@@ -9,7 +9,7 @@ use crate::{
     },
 };
 
-pub async fn signup(Json(create_user_payload): Json<UserSignupPayload>) -> AppResult<String> {
+pub async fn signup(Json(create_user_payload): Json<UserSignupPayload>) -> AppResult<()> {
     let pool = get_pool().await;
     // 查询用户名是否存在
     sql::user::query_user_name_is_exist(pool, &create_user_payload.user_name).await?;
