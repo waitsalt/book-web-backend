@@ -65,8 +65,8 @@ insert into
         author_id,
         author_name,
         platform,
-        user_id,
-        user_name
+        uploader_id,
+        uploader_name
     )
 values
     ('book_name_1', 1, 'test', 'test', 1, 'root');
@@ -79,6 +79,8 @@ create table chapter (
     author_id int,
     author_name text,
     platform text default '',
+    uploader_id int,
+    uploader_name text,
     chapter_id int,
     chapter_name text,
     chapter_content text,
@@ -87,6 +89,7 @@ create table chapter (
     create_time timestamp with time zone not null default now(),
     update_time timestamp with time zone not null default now(),
     foreign key (book_id) references book (book_id),
+    foreign key (uploader_id) references user (user_id),
     foreign key (author_id) references author (author_id),
     primary key (book_id, chapter_id)
 );

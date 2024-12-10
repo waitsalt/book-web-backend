@@ -12,6 +12,8 @@ pub async fn create_chapter(
     author_id: &i32,
     author_name: &str,
     platform: &str,
+    uploader_id: &i32,
+    uploader_name: &str,
     roll_id: &i16,
     roll_name: &str,
     chapter_id: &i32,
@@ -20,7 +22,7 @@ pub async fn create_chapter(
 ) -> Result<()> {
     let sql = "
         insert into
-            chapter (book_id, book_name, author_id, author_name, platform, roll_id, roll_name, chapter_id, chapter_name, chapter_content)
+            chapter (book_id, book_name, author_id, author_name, platform, uploader_id, uploader_name, roll_id, roll_name, chapter_id, chapter_name, chapter_content)
         values
             ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);";
     let _ = sqlx::query(sql)
@@ -29,6 +31,8 @@ pub async fn create_chapter(
         .bind(author_id)
         .bind(author_name)
         .bind(platform)
+        .bind(uploader_id)
+        .bind(uploader_name)
         .bind(roll_id)
         .bind(roll_name)
         .bind(chapter_id)

@@ -10,18 +10,18 @@ use crate::{
 };
 
 pub async fn create_book(
-    claims_user_opt: Option<UserClaims>,
-    Json(create_book_payload): Json<BookCreatePayload>,
+    user_claims_opt: Option<UserClaims>,
+    Json(book_create_payload): Json<BookCreatePayload>,
 ) -> AppResult<String> {
-    let claims_user = check_admin(claims_user_opt).await?;
+    let user_claims = check_admin(user_claims_opt).await?;
 
     let pool = get_pool().await;
 
     // 确认作者是否存在
     let res = sql::author::get_author_info(
         pool,
-        &create_book_payload.author_name,
-        &create_book_payload.platform,
+        &book_create_payload.author_name,
+        &book_create_payload.platform,
     )
     .await;
 
@@ -31,15 +31,15 @@ pub async fn create_book(
             // 新建
             sql::author::create_author(
                 pool,
-                &create_book_payload.author_name,
-                &create_book_payload.platform,
+                &book_create_payload.author_name,
+                &book_create_payload.platform,
             )
             .await?;
             // 获取
             sql::author::get_author_info(
                 pool,
-                &create_book_payload.author_name,
-                &create_book_payload.platform,
+                &book_create_payload.author_name,
+                &book_create_payload.platform,
             )
             .await?
         }
@@ -47,7 +47,7 @@ pub async fn create_book(
 
     let res = sql::book::get_book_info_by_book_name_with_author_id(
         pool,
-        &create_book_payload.book_name,
+        &book_create_payload.book_name,
         &author.author_id,
     )
     .await;
@@ -57,38 +57,39 @@ pub async fn create_book(
     }
     sql::book::create_book(
         pool,
-        &create_book_payload.book_name,
+        &book_create_payload.book_name,
         &author.author_id,
         &author.author_name,
         &author.platform,
-        &claims_user.user_public.user_id,
-        &claims_user.user_public.user_name,
-        &create_book_payload.cover_url,
-        &create_book_payload.source_url,
-        &create_book_payload.book_tags,
-        &create_book_payload.book_desc,
-        &create_book_payload.book_class,
-        &create_book_payload.book_status,
+        &user_claims.user_public.user_id,
+        &user_claims.user_public.user_name,
+        &book_create_payload.cover_url,
+        &book_create_payload.source_url,
+        &book_create_payload.book_tags,
+        &book_create_payload.book_desc,
+        &book_create_payload.book_class,
+        &book_create_payload.book_status,
+    )
+    .await?;
+
+    let book = sql::book::get_book_info_by_book_name_with_author_id(
+        pool,
+        &book_create_payload.book_name,
+        &author.author_id,
     )
     .await?;
 
     let chapter_content = format!(
-        "书名:{}\n作者:{}\n状态:{}\n类别:{}\n标签:{}\n简介:{}\n来源:{}",
-        create_book_payload.book_name,
-        create_book_payload.author_name,
-        create_book_payload.book_status,
-        create_book_payload.book_class,
-        create_book_payload.book_tags,
-        create_book_payload.book_desc,
-        create_book_payload.source_url
+        "书名:{}\n作者:{}\n平台:{}\n来源:{}\n状态:{}\n类别:{}\n标签:{}\n简介:{}",
+        book_create_payload.book_name,
+        book_create_payload.author_name,
+        book_create_payload.platform,
+        book_create_payload.source_url,
+        book_create_payload.book_status,
+        book_create_payload.book_class,
+        book_create_payload.book_tags,
+        book_create_payload.book_desc,
     );
-
-    let book = sql::book::get_book_info_by_book_name_with_author_id(
-        pool,
-        &create_book_payload.book_name,
-        &author.author_id,
-    )
-    .await?;
 
     // 建立
     sql::chapter::create_chapter(
@@ -98,6 +99,8 @@ pub async fn create_book(
         &book.author_id,
         &book.author_name,
         &book.platform,
+        &user_claims.user_public.user_id,
+        &user_claims.user_public.user_name,
         &0,
         "正文",
         &0,

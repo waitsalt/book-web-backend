@@ -10,11 +10,11 @@ use crate::{
 };
 
 pub async fn create_chapter(
-    claims_user_opt: Option<UserClaims>,
+    user_claims_opt: Option<UserClaims>,
     Path(book_id): Path<i32>,
     Json(create_chapter_payload): Json<CreateChapterPayload>,
 ) -> AppResult<String> {
-    let _claims_user = check_admin(claims_user_opt).await?;
+    let user_claims = check_admin(user_claims_opt).await?;
     let pool = get_pool().await;
 
     // 获取书籍信息
@@ -36,6 +36,8 @@ pub async fn create_chapter(
         &book.author_id,
         &book.author_name,
         &book.platform,
+        &user_claims.user_public.user_id,
+        &user_claims.user_public.user_name,
         &create_chapter_payload.roll_id,
         &create_chapter_payload.roll_name,
         &create_chapter_payload.chapter_id,
