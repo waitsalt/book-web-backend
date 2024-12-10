@@ -61,7 +61,7 @@ impl From<sqlx::error::Error> for AppError {
 
 impl IntoResponse for AppError {
     fn into_response(self) -> axum::response::Response {
-        let bad_request = StatusCode::BAD_REQUEST;
+        let bad_request = StatusCode::OK;
         let (status_code, code, message) = match self {
             // user
             AppError::UserNameExist => (bad_request, 1001, "user name exist"),

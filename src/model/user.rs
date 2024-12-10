@@ -133,3 +133,20 @@ impl UserAuth {
 pub struct UserUpdateAvatarUrlPayload {
     pub avatar_url: String,
 }
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct UserVerifyEmailPayload {
+    pub user_email: String,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct UserUpdateEmailPayload {
+    pub user_email: String,
+    pub captcha_email: String,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct UserUpdatePasswordPayload {
+    pub old_password: String,
+    pub new_password: String,
+}

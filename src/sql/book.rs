@@ -11,8 +11,8 @@ pub async fn create_book(
     author_id: &i32,
     author_name: &str,
     platform: &str,
-    user_id: &i32,
-    user_name: &str,
+    uploader_id: &i32,
+    uploader_name: &str,
     cover_url: &str,
     source_url: &str,
     book_tags: &str,
@@ -30,8 +30,8 @@ pub async fn create_book(
         .bind(author_id)
         .bind(author_name)
         .bind(platform)
-        .bind(user_id)
-        .bind(user_name)
+        .bind(uploader_id)
+        .bind(uploader_name)
         .bind(cover_url)
         .bind(source_url)
         .bind(book_tags)

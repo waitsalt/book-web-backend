@@ -182,3 +182,41 @@ pub async fn update_avatar_url(
         .unwrap();
     Ok(())
 }
+
+pub async fn update_email(pool: &Pool<Postgres>, user_id: &i32, user_email: &str) -> Result<()> {
+    let sql = "
+    update
+        \"user\"
+    set
+        user_email = $1
+    where
+        user_id = $2";
+    let _ = sqlx::query(sql)
+        .bind(user_email)
+        .bind(user_id)
+        .execute(pool)
+        .await
+        .unwrap();
+    Ok(())
+}
+
+pub async fn update_password(
+    pool: &Pool<Postgres>,
+    user_id: &i32,
+    user_password: &str,
+) -> Result<()> {
+    let sql = "
+    update
+        \"user\"
+    set
+        user_password = $1
+    where
+        user_id = $2";
+    let _ = sqlx::query(sql)
+        .bind(user_password)
+        .bind(user_id)
+        .execute(pool)
+        .await
+        .unwrap();
+    Ok(())
+}

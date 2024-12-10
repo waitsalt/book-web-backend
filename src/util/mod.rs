@@ -1,6 +1,7 @@
 pub mod app_error;
 pub mod app_response;
 pub mod auth;
+pub mod captcha_email;
 pub mod config;
 pub mod database;
 pub mod email;

@@ -37,8 +37,8 @@ create table book (
     author_id int,
     author_name text,
     platform text default '',
-    user_id int,
-    user_name text,
+    uploader_id int,
+    uploader_name text,
     manager_id int default 1,
     manager_name text default 'root',
     cover_url text default '',
@@ -54,7 +54,7 @@ create table book (
     read_time int default 0,
     create_time timestamp with time zone not null default now(),
     update_time timestamp with time zone not null default now(),
-    foreign key (user_id) references "user" (user_id),
+    foreign key (uploader_id) references "user" (user_id),
     foreign key (manager_id) references "user" (user_id),
     foreign key (author_id) references author (author_id)
 );

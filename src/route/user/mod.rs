@@ -3,7 +3,10 @@ mod refresh_access_token;
 mod signin;
 mod signup;
 mod update_avatar_url;
+mod update_email;
+mod update_password;
 mod verify_access_token;
+mod verify_email;
 
 use axum::{
     routing::{get, post},
@@ -27,4 +30,7 @@ pub async fn init() -> Router {
             "/verify_access_token",
             get(verify_access_token::verify_access_token),
         )
+        .route("/update_email", post(update_email::update_email))
+        .route("/verify_email", post(verify_email::verify_email))
+        .route("/update_password", post(update_password::update_password))
 }
