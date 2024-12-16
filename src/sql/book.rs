@@ -2,7 +2,7 @@ use sqlx::{Pool, Postgres};
 
 use crate::{
     model::book::BookInfo,
-    util::{app_error::AppError, Result},
+    util::{app_error::AppError, app_response::AppResponse, AppResult, Result},
 };
 
 pub async fn create_book(
@@ -22,7 +22,7 @@ pub async fn create_book(
 ) -> Result<()> {
     let sql = "
         insert into
-            book (book_name, author_id, author_name, platform, user_id, user_name, cover_url, source_url, book_tags, book_desc, book_class, book_status)
+            book (book_name, author_id, author_name, platform, uploader_id, uploader_name, cover_url, source_url, book_tags, book_desc, book_class, book_status)
         values
             ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);";
     let _ = sqlx::query(sql)
@@ -152,4 +152,15 @@ pub async fn verify_book(
         .await
         .unwrap();
     Ok(books)
+}
+
+pub async fn book_list_latest_update(pool: &Pool<Postgres>) -> Result<Vec<BookInfo>> {
+    let sql = "
+        select *
+        from book
+        order by update_time
+        limit 10;
+        ";
+    let book_info_list: Vec<BookInfo> = sqlx::query_as(sql).fetch_all(pool).await.unwrap();
+    Ok(book_info_list)
 }

@@ -34,7 +34,6 @@ pub async fn refresh_sign(user_refresh_claims: UserRefreshClaims) -> Result<Stri
 
 pub async fn check_user_status(user_claims: UserClaims) -> Result<UserClaims, AppError> {
     let local_time = Utc::now().timestamp_millis();
-    println!("{local_time}");
     if local_time > user_claims.exp {
         return Err(AppError::AccessTokenMiss);
     }

@@ -1,6 +1,8 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
+use super::roll::RollCreate;
+
 #[derive(Debug, Deserialize, Serialize, sqlx::FromRow)]
 pub struct BookInfo {
     pub book_id: i32,
@@ -28,7 +30,7 @@ pub struct BookInfo {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct BookCreatePayload {
+pub struct BookCreateInfoPayload {
     pub book_name: String,
     pub author_name: String,
     pub platform: String,
@@ -38,6 +40,12 @@ pub struct BookCreatePayload {
     pub book_desc: String,
     pub book_class: String,
     pub book_status: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct BookCreatePayload {
+    pub book_create_info_payload: BookCreateInfoPayload,
+    pub roll_create_list: Vec<RollCreate>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

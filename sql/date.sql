@@ -26,11 +26,6 @@ create table author (
 
 create unique index author_index_author_name_platform on author (author_name, platform);
 
-insert into
-    author (author_name, platform)
-values
-    ('test', 'test');
-
 create table book (
     book_id serial primary key,
     book_name text not null,
@@ -59,19 +54,20 @@ create table book (
     foreign key (author_id) references author (author_id)
 );
 
-insert into
-    book (
-        book_name,
-        author_id,
-        author_name,
-        platform,
-        uploader_id,
-        uploader_name
-    )
-values
-    ('book_name_1', 1, 'test', 'test', 1, 'root');
-
 create unique index book_index_book_name on book (book_name, author_name, platform);
+
+create table roll (
+    book_id int,
+    book_name text,
+    author_id int,
+    author_name text,
+    platform text,
+    roll_id int,
+    roll_name text,
+    primary key (book_id, roll_id),
+    foreign key (book_id) references "book" (book_id),
+    foreign key (author_id) references author (author_id)
+);
 
 create table chapter (
     book_id int,
@@ -89,7 +85,7 @@ create table chapter (
     create_time timestamp with time zone not null default now(),
     update_time timestamp with time zone not null default now(),
     foreign key (book_id) references book (book_id),
-    foreign key (uploader_id) references user (user_id),
+    foreign key (uploader_id) references "user" (user_id),
     foreign key (author_id) references author (author_id),
     primary key (book_id, chapter_id)
 );

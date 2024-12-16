@@ -37,11 +37,17 @@ pub struct ChapterInfo {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct CreateChapterPayload {
+pub struct ChapterCreatePayload {
     pub book_name: String,
     pub roll_id: i16,
     pub roll_name: String,
     pub chapter_id: i32,
+    pub chapter_name: String,
+    pub chapter_content: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct ChapterCreate {
     pub chapter_name: String,
     pub chapter_content: String,
 }

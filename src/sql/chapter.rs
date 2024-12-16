@@ -24,7 +24,7 @@ pub async fn create_chapter(
         insert into
             chapter (book_id, book_name, author_id, author_name, platform, uploader_id, uploader_name, roll_id, roll_name, chapter_id, chapter_name, chapter_content)
         values
-            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);";
+            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);";
     let _ = sqlx::query(sql)
         .bind(book_id)
         .bind(book_name)
