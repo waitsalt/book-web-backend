@@ -6,7 +6,7 @@ use crate::{
     util::{app_response::AppResponse, database::get_pool, AppResult},
 };
 
-pub async fn search_book(
+pub async fn book_search(
     Json(search_book_payload): Json<BookSearchPayload>,
 ) -> AppResult<Vec<BookInfo>> {
     let pool = get_pool().await;

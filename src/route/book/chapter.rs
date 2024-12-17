@@ -6,7 +6,7 @@ use crate::{
     util::{app_response::AppResponse, config::CONFIG, database::get_pool, AppResult},
 };
 
-pub async fn get_chapter(Path((book_id, chapter_id)): Path<(i32, i32)>) -> AppResult<Chapter> {
+pub async fn chapter(Path((book_id, chapter_id)): Path<(i32, i32)>) -> AppResult<Chapter> {
     let pool = get_pool().await;
     let chapter = sql::chapter::get_chapter(pool, &book_id, &chapter_id).await?;
     let book_base_path = CONFIG.data.path.clone();

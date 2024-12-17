@@ -158,7 +158,7 @@ pub async fn book_list_latest_update(pool: &Pool<Postgres>) -> Result<Vec<BookIn
     let sql = "
         select *
         from book
-        order by update_time
+        order by update_time desc
         limit 10;
         ";
     let book_info_list: Vec<BookInfo> = sqlx::query_as(sql).fetch_all(pool).await.unwrap();

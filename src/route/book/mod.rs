@@ -1,39 +1,39 @@
-mod create_book;
-mod create_chapter;
-mod delete_book;
-mod delete_chapter;
-mod get_all_book;
-mod get_book_info;
-mod get_chapter;
-mod get_chapter_list;
-mod latest_update_books;
-mod search_book;
-mod verify_book;
+mod book_create;
+mod book_info;
+mod book_info_all;
+mod book_info_list_latest_update;
+mod book_search;
+mod book_verify;
+mod chapter;
+mod chapter_create;
+mod chapter_info_list;
 
 use axum::{
     routing::{get, post},
     Router,
 };
-use latest_update_books::latest_update_books;
 
 pub async fn init() -> Router {
     Router::new()
         .route(
             "/",
-            get(get_all_book::get_all_book).post(create_book::create_book),
+            get(book_info_all::book_info_all).post(book_create::book_create),
         )
-        .route("/search", post(search_book::search_book))
+        .route("/search", post(book_search::book_search))
         .route(
             "/:book_id",
-            get(get_book_info::get_book_info).post(create_chapter::create_chapter),
+            get(book_info::book_info).post(chapter_create::chapter_create),
         )
         .route(
             "/:book_id/chapter_list",
-            get(get_chapter_list::get_chapter_list),
+            get(chapter_info_list::chapter_info_list),
         )
-        .route("/:book_id/:chapter_id", get(get_chapter::get_chapter))
-        .route("/latest_update", get(latest_update_books))
-        .route("/verify_book", post(verify_book::verify_book))
+        .route("/:book_id/:chapter_id", get(chapter::chapter))
+        .route(
+            "/latest_update",
+            get(book_info_list_latest_update::book_info_list_latest_update),
+        )
+        .route("/verify_book", post(book_verify::book_verify))
 }
 
 // async fn book_root() -> &'static str {

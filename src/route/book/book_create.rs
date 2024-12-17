@@ -1,10 +1,7 @@
 use axum::Json;
 
 use crate::{
-    model::{
-        book::{BookCreateInfoPayload, BookCreatePayload},
-        user::UserClaims,
-    },
+    model::{book::BookCreatePayload, user::UserClaims},
     sql,
     util::{
         app_error::AppError, app_response::AppResponse, auth::check_admin, database::get_pool,
@@ -12,7 +9,7 @@ use crate::{
     },
 };
 
-pub async fn create_book(
+pub async fn book_create(
     user_claims_opt: Option<UserClaims>,
     Json(book_create_payload): Json<BookCreatePayload>,
 ) -> AppResult<String> {
@@ -83,7 +80,7 @@ pub async fn create_book(
     )
     .await?;
 
-    let chapter_content = format!(
+    let _chapter_content = format!(
         "书名:{}\n作者:{}\n平台:{}\n来源:{}\n状态:{}\n类别:{}\n标签:{}\n简介:{}",
         book_create_info_payload.book_name,
         book_create_info_payload.author_name,

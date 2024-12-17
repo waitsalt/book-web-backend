@@ -6,7 +6,7 @@ use crate::{
     util::{app_error::AppError, app_response::AppResponse, database::get_pool, AppResult},
 };
 
-pub async fn verify_book(Json(book_verify_payload): Json<BookVerifyPayload>) -> AppResult<()> {
+pub async fn book_verify(Json(book_verify_payload): Json<BookVerifyPayload>) -> AppResult<()> {
     let pool = get_pool().await;
     let book_info_list = sql::book::verify_book(
         pool,

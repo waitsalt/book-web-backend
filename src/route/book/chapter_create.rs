@@ -9,7 +9,7 @@ use crate::{
     },
 };
 
-pub async fn create_chapter(
+pub async fn chapter_create(
     user_claims_opt: Option<UserClaims>,
     Path(book_id): Path<i32>,
     Json(chapter_create_payload): Json<ChapterCreatePayload>,
