@@ -2,7 +2,7 @@ use sqlx::{Pool, Postgres};
 
 use crate::{
     model::book::BookInfo,
-    util::{app_error::AppError, app_response::AppResponse, AppResult, Result},
+    util::{app_error::AppError, Result},
 };
 
 pub async fn create_book(

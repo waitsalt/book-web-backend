@@ -1,5 +1,4 @@
 use crate::route;
-use crate::util::config::CONFIG;
 use crate::util::{database, logger, redis};
 use axum::Router;
 
